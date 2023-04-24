@@ -20,7 +20,6 @@ struct Gems
 	int CheckNumb;
 	SDL_Rect CardRect;
 	bool check_open = 0;
-	SDL_Rect BackRect;
 	bool full_open = 0;
 };  
 
@@ -51,15 +50,38 @@ void tapsound(Mix_Chunk* Sound)
 	Mix_PlayChannel(-1, Sound, 0);
 }
 
-//void UploadPict(SDL_Renderer*& render, SDL_Surface* SurfImage[], int number, SDL_Texture* TexturImage[], Gems gems[])
+void UploadPict(SDL_Renderer*& render, SDL_Surface* SurfImage[], int number, SDL_Texture* TexturImage[], Gems gems[])
+{
+	char numb[10];
+	_itoa_s(number, numb, 10);
+	strcat_s(numb, ".bmp");
+	SurfImage[number] = IMG_Load(numb);
+	TexturImage[number] = SDL_CreateTextureFromSurface(render, SurfImage[number]);
+	gems[number].GemTexture = TexturImage[number];
+}
+
+//void Grid(SDL_Renderer* render, Gems gem[])
 //{
-//	char numb[10];
-//	_itoa_s(number, numb, 10);
-//	strcat_s(numb, ".bmp");
-//	SurfImage[number] = IMG_Load(numb);
-//	TexturImage[number] = SDL_CreateTextureFromSurface(render, SurfImage[number]);
-//	gems[number].GemTexture = TexturImage[number];
+//	for (int i = 0; i < 8; i++)
+//	{
+//		for (int j = 0; j < 8; j++)
+//		{
+//			cards[j + 3 * i].CardRect = { 80 + i * 200, 50 + j * 200, 150, 150 };
+//			SDL_RenderCopy(render, cards[j + 3 * i].CardTexture, NULL, &cards[j + 3 * i].CardRect);
+//		}
+//	}
 //}
+
+void DrawCells(SDL_Renderer*& renderer, Gems gem[][8], Gems gems[])
+{
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			SDL_RenderCopy(renderer, gems[2].GemTexture, NULL, &gem[i][j].CardRect);
+		}
+	}
+}
 
 bool CheckMenuHit(SDL_Rect MenuButtons, int x, int y)
 {
@@ -81,6 +103,7 @@ int main(int argc, char* argv[])
 	SDL_Renderer* renderer = NULL;
 	Mix_Chunk* Sound = NULL;
 	Mix_Music* fonmusic = NULL;
+	SDL_Texture* TexturImage[6];
 	SDL_Texture* SettingsBut[4];
 	SDL_Texture* textTexture = NULL;
 	TTF_Font* my_font = NULL;
@@ -158,13 +181,21 @@ int main(int argc, char* argv[])
 			Mix_VolumeMusic(Music);
 			loadmusic(fonmusic);
 
-			/*SDL_Surface* SurfImage[NumbPict];
-			Gems GemGame[64];
-			SurfImage[0] = IMG_Load("back.bmp");
-			TexturImage[0] = SDL_CreateTextureFromSurface(renderer, SurfImage[0]);
-			for (int i = 1; i < NumbPict; i++) UploadPict(renderer, SurfImage, i, TexturImage, GemGame);
-			for (int i = 1; i < 64; i++) GemGame[i].GemTexture = SDL_CreateTextureFromSurface(renderer, SurfImage[i]);
-			for (int i = 0; i < NumbPict; i++) SDL_FreeSurface(SurfImage[i]);*/
+			SDL_Surface* SurfImage[6];
+			Gems GemGame[6];
+			for (int i = 0; i < 6; i++) UploadPict(renderer, SurfImage, i, TexturImage, GemGame);
+			for (int i = 0; i < 6; i++) SDL_SetColorKey(SurfImage[i], SDL_TRUE, SDL_MapRGB(SurfImage[i]->format, 255, 255, 255));
+			for (int i = 0; i < 6; i++) GemGame[i].GemTexture = SDL_CreateTextureFromSurface(renderer, SurfImage[i]);
+			for (int i = 0; i < 6; i++) SDL_FreeSurface(SurfImage[i]);
+
+			Gems gem[8][8];
+			for (int i = 0; i < 8; i++)
+			{
+				for (int j = 0; j < 8; j++)
+				{
+					gem[i][j].CardRect = { W/4 - 25 + 50 * i, W/4 - 25 + 50 * j, 50, 50 };
+				}
+			}
 			
 			int Check_Window = 0;
 			SDL_Event event;
@@ -195,11 +226,37 @@ int main(int argc, char* argv[])
 									}
 									if (i == 3) Check_Window = 4;
 									if (i == 2) Check_Window = 3;
+									if (i == 1) Check_Window = 2;
+									if (i == 0) Check_Window = 1;
 								}
 							}
 						}
 					}
 					SDL_RenderCopy(renderer, TexturMenu, NULL, &MenuRect);
+					SDL_RenderPresent(renderer);
+				}
+				while (Check_Window == 1)
+				{
+					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
+					while (SDL_PollEvent(&event))
+					{
+						if (event.type == SDL_QUIT)
+						{
+							Check_Window = -1;
+							quit = 1;
+						}
+						if (event.type == SDL_MOUSEBUTTONDOWN && (event.button.button == SDL_BUTTON_LEFT))
+						{
+							for (int i = 0; i < 5; i++)
+							{
+								if (CheckMenuHit(MenuButtons[i], event.button.x, event.button.y))
+								{
+									
+								}
+							}
+						}
+					}
+					DrawCells(renderer, gem, GemGame);
 					SDL_RenderPresent(renderer);
 				}
 				while (Check_Window == 3)
