@@ -22,6 +22,20 @@ struct Gems
 	bool full_open = 0;
 };  
 
+SDL_Texture* get_text_texture(SDL_Renderer*& renderer, char* text, TTF_Font* font, SDL_Color fore_color)
+{
+	SDL_Surface* textSurface = NULL;
+	SDL_Color back_color = { 40, 94, 42 };
+	textSurface = TTF_RenderText_Shaded(font, text, fore_color, back_color);
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, textSurface);
+	SDL_FreeSurface(textSurface);
+	return texture;
+}
+
+void draw_text(SDL_Renderer*& renderer, SDL_Texture* texture, SDL_Rect rect)
+{
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
+}
 
 void loadmusic(Mix_Music* fon)
 {
@@ -65,8 +79,9 @@ int main(int argc, char* argv[])
 	SDL_Renderer* renderer = NULL;
 	Mix_Chunk* Sound = NULL;
 	Mix_Music* fonmusic = NULL;
-	SDL_Texture* TexturImage[NumbPict];
 	SDL_Texture* SettingsBut[4];
+	SDL_Texture* textTexture = NULL;
+	TTF_Font* my_font = NULL;
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) printf("SDL не смог запуститься! SDL_Error: %s\n", SDL_GetError());
 	else
 	{
@@ -101,6 +116,22 @@ int main(int argc, char* argv[])
 			for (int i = 0; i < 4; i++) SDL_FreeSurface(SettingsButtons[i]);
 			SDL_Rect SetButtons[4];
 			for (int i = 0; i < 4; i++) SetButtons[i] = { W/4 + 100*i, H / 2, 50, 50};
+
+			TTF_Init();
+			my_font = TTF_OpenFont("arial.ttf", 100);
+			int time1 = 10, time2 = 20, time3 = 30;
+			char time1txt[10], time2txt[10], time3txt[10];
+			char BestTime[55] = "Your best times: ";
+			_itoa_s(time1, time1txt, 10);
+			_itoa_s(time2, time2txt, 10);
+			_itoa_s(time3, time3txt, 10);
+			strcat_s(BestTime, time1txt);
+			strcat_s(BestTime, time2txt);
+			strcat_s(BestTime, time1txt);
+			SDL_Color BestTimeColor = { 0, 0, 0 };
+			SDL_Rect BestTimeRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
+			SDL_Texture* ResTexture = get_text_texture(renderer, BestTime, my_font, BestTimeColor);
+			SDL_Rect BackButtonRect = { W - SetButtons[3].w, H - SetButtons[3].h, 50, 50 };
 			
 			int Music = 100, tempmusic;
 			int SoundTap = 100, tempsoundtap;
@@ -145,7 +176,7 @@ int main(int argc, char* argv[])
 										quit = 1;
 									}
 									if (i == 3) Check_Window = 4;
-									std::cout << i << std::endl;
+									if (i == 2) Check_Window = 3;
 								}
 							}
 						}
@@ -153,7 +184,30 @@ int main(int argc, char* argv[])
 					SDL_RenderCopy(renderer, TexturMenu, NULL, &MenuRect);
 					SDL_RenderPresent(renderer);
 				}
+				while (Check_Window == 3)
+				{
+					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
+					while (SDL_PollEvent(&event))
+					{
 
+						if (event.type == SDL_QUIT)
+						{
+							Check_Window = -1;
+							quit = 1;
+						}
+						if (event.type == SDL_MOUSEBUTTONDOWN && (event.button.button == SDL_BUTTON_LEFT))
+						{
+							if (CheckMenuHit(BackButtonRect, event.button.x, event.button.y))
+							{
+								tapsound(Sound);
+								Check_Window = 0;
+							}
+						}
+					}
+					draw_text(renderer, ResTexture, BestTimeRect);
+					SDL_RenderCopy(renderer, SettingsBut[3], NULL, &BackButtonRect);
+					SDL_RenderPresent(renderer);
+				}
 				while (Check_Window == 4)
 				{
 					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
@@ -171,14 +225,6 @@ int main(int argc, char* argv[])
 								if (CheckMenuHit(SetButtons[i], event.button.x, event.button.y))
 								{
 									tapsound(Sound);
-									if (i == 3)	Check_Window = 0;
-									if (i == 1)
-									{
-										if (Music == 100) tempmusic = 0;
-										if (Music == 0) tempmusic = 100;
-										Music = tempmusic;
-										Mix_VolumeMusic(Music);
-									}
 									if (i == 0)
 									{
 										if (SoundTap == 100) tempsoundtap = 0;
@@ -186,7 +232,18 @@ int main(int argc, char* argv[])
 										SoundTap = tempsoundtap;
 										Mix_Volume(-1, SoundTap);
 									}
-									std::cout << i << std::endl;
+									if (i == 1)
+									{
+										if (Music == 100) tempmusic = 0;
+										if (Music == 0) tempmusic = 100;
+										Music = tempmusic;
+										Mix_VolumeMusic(Music);
+									}
+									if (i == 2)
+									{
+
+									}
+									if (i == 3)	Check_Window = 0;
 								}
 							}
 						}
