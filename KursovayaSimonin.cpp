@@ -39,6 +39,13 @@ void UploadPict(SDL_Renderer*& render, SDL_Surface* SurfImage[], int number, SDL
 	gems[number].GemTexture = TexturImage[number];
 }
 
+bool CheckMenuHit(SDL_Rect MenuButtons, int x, int y)
+{
+	int CenterX = MenuButtons.x + (MenuButtons.w / 2);
+	int CenterY = MenuButtons.y + (MenuButtons.h / 2);
+	return (CenterX + MenuButtons.w / 2 > x) && (CenterX - MenuButtons.w / 2 < x) && (CenterY + MenuButtons.h / 2 > y) && (CenterY - MenuButtons.h / 2 < y);
+}
+
 int main(int argc, char* argv[])
 {
 	SDL_Renderer* renderer = NULL;
@@ -59,11 +66,13 @@ int main(int argc, char* argv[])
 			SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
 
 			SDL_Surface* Menu_Button = IMG_Load("menu.bmp");
-			SDL_Rect MenuRect = { W / 2 - 217, H / 2 - 152, 435, 305 };
+			SDL_Rect MenuRect = { W / 2 - 217, H / 2 - 152, 435, 374 };
 			SDL_SetColorKey(Menu_Button, SDL_TRUE, SDL_MapRGB(Menu_Button->format, 255, 255, 255));
 			SDL_Texture* TexturMenu = SDL_CreateTextureFromSurface(renderer, Menu_Button);
 			SDL_FreeSurface(Menu_Button);
 			SDL_RenderCopy(renderer, TexturMenu, NULL, &MenuRect);
+			SDL_Rect MenuButtons[5];
+			for (int i = 0; i < 5; i++) MenuButtons[i] = {MenuRect.x + 6, MenuRect.y + 6 + 80 * i, MenuRect.w - 12, 50};
 
 			Mix_Init(0);
 			Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024);
@@ -93,10 +102,30 @@ int main(int argc, char* argv[])
 							Check_Window = -1;
 							quit = 1;
 						}
+						if (event.type == SDL_MOUSEBUTTONDOWN && (event.button.button == SDL_BUTTON_LEFT) || (event.button.button == SDL_BUTTON_RIGHT))
+						{
+							for (int i = 0; i < 5; i++)
+							{
+								if (CheckMenuHit(MenuButtons[i], event.button.x, event.button.y))
+								{
+									if (i == 4)
+									{
+										Check_Window = -1;
+										quit = 1;
+									}
+									std::cout << i << std::endl;
+								}
+							}
+						}
 					}
 					SDL_RenderPresent(renderer);
 				}
 			}
+			Mix_FreeMusic(fonmusic);
+			Mix_CloseAudio();
+			SDL_DestroyRenderer(renderer);
+			SDL_DestroyWindow(window);
+			SDL_Quit();
 		}
 	}
     return 0;
