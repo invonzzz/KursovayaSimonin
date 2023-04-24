@@ -88,7 +88,6 @@ int main(int argc, char* argv[])
 			for (int i = 0; i < NumbPict; i++) SDL_FreeSurface(SurfImage[i]);*/
 			
 			int Check_Window = 0;
-
 			SDL_Event event;
 			bool quit = 0;
 			while (!quit)
