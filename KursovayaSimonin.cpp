@@ -77,6 +77,7 @@ int main(int argc, char* argv[])
 			for (int i = 1; i < NumbPict; i++) UploadPict(renderer, SurfImage, i, TexturImage, GemGame);
 			for (int i = 1; i < 64; i++) GemGame[i].GemTexture = SDL_CreateTextureFromSurface(renderer, SurfImage[i]);
 			for (int i = 0; i < NumbPict; i++) SDL_FreeSurface(SurfImage[i]);*/
+			
 			int Check_Window = 0;
 
 			SDL_Event event;
