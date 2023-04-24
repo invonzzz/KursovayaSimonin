@@ -29,6 +29,12 @@ void loadmusic(Mix_Music* fon)
 	Mix_PlayMusic(fon, -1);
 }
 
+void tapsound(Mix_Chunk* Sound)
+{
+	Sound = Mix_LoadWAV("tap_sound.wav");
+	Mix_PlayChannel(-1, Sound, 0);
+}
+
 void UploadPict(SDL_Renderer*& render, SDL_Surface* SurfImage[], int number, SDL_Texture* TexturImage[], Gems gems[])
 {
 	char numb[10];
@@ -46,11 +52,21 @@ bool CheckMenuHit(SDL_Rect MenuButtons, int x, int y)
 	return (CenterX + MenuButtons.w / 2 > x) && (CenterX - MenuButtons.w / 2 < x) && (CenterY + MenuButtons.h / 2 > y) && (CenterY - MenuButtons.h / 2 < y);
 }
 
+void SetBut(SDL_Renderer* render, SDL_Rect SettingsButtons[])
+{
+	for (int i = 0; i < 3; i++)
+	{
+		SettingsButtons[i] = { 80 + i * 200, 50 + i * 200, 50, 50 };
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	SDL_Renderer* renderer = NULL;
+	Mix_Chunk* Sound = NULL;
 	Mix_Music* fonmusic = NULL;
 	SDL_Texture* TexturImage[NumbPict];
+	SDL_Texture* SettingsBut[4];
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) printf("SDL не смог запуститься! SDL_Error: %s\n", SDL_GetError());
 	else
 	{
@@ -70,13 +86,27 @@ int main(int argc, char* argv[])
 			SDL_SetColorKey(Menu_Button, SDL_TRUE, SDL_MapRGB(Menu_Button->format, 255, 255, 255));
 			SDL_Texture* TexturMenu = SDL_CreateTextureFromSurface(renderer, Menu_Button);
 			SDL_FreeSurface(Menu_Button);
-			SDL_RenderCopy(renderer, TexturMenu, NULL, &MenuRect);
 			SDL_Rect MenuButtons[5];
 			for (int i = 0; i < 5; i++) MenuButtons[i] = {MenuRect.x + 6, MenuRect.y + 6 + 80 * i, MenuRect.w - 12, 50};
 
+			SDL_Surface* SettingsButtons[4];
+			SettingsButtons[0] = IMG_Load("SoundButton.bmp");
+			SettingsBut[0] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[0]);
+			SettingsButtons[1] = IMG_Load("MusicButton.bmp");
+			SettingsBut[1] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[1]);
+			SettingsButtons[2] = IMG_Load("ScreenButton.bmp");
+			SettingsBut[2] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[2]);
+			SettingsButtons[3] = IMG_Load("BackButton.bmp");
+			SettingsBut[3] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[3]);
+			for (int i = 0; i < 4; i++) SDL_FreeSurface(SettingsButtons[i]);
+			SDL_Rect SetButtons[4];
+			for (int i = 0; i < 4; i++) SetButtons[i] = { W/4 + 100*i, H / 2, 50, 50};
+			
+			int Music = 100, tempmusic;
+			int SoundTap = 100, tempsoundtap;
 			Mix_Init(0);
 			Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024);
-			Mix_VolumeMusic(10);
+			Mix_VolumeMusic(Music);
 			loadmusic(fonmusic);
 
 			/*SDL_Surface* SurfImage[NumbPict];
@@ -91,9 +121,10 @@ int main(int argc, char* argv[])
 			SDL_Event event;
 			bool quit = 0;
 			while (!quit)
-			{
+			{			
 				while (Check_Window == 0)
 				{
+					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
 					while (SDL_PollEvent(&event))
 					{
 						if (event.type == SDL_QUIT)
@@ -101,52 +132,73 @@ int main(int argc, char* argv[])
 							Check_Window = -1;
 							quit = 1;
 						}
-						if (event.type == SDL_MOUSEBUTTONDOWN && (event.button.button == SDL_BUTTON_LEFT) || (event.button.button == SDL_BUTTON_RIGHT))
+						if (event.type == SDL_MOUSEBUTTONDOWN && (event.button.button == SDL_BUTTON_LEFT))
 						{
 							for (int i = 0; i < 5; i++)
 							{
 								if (CheckMenuHit(MenuButtons[i], event.button.x, event.button.y))
 								{
+									tapsound(Sound);
 									if (i == 4)
 									{
 										Check_Window = -1;
 										quit = 1;
+									}
+									if (i == 3) Check_Window = 4;
+									std::cout << i << std::endl;
+								}
+							}
+						}
+					}
+					SDL_RenderCopy(renderer, TexturMenu, NULL, &MenuRect);
+					SDL_RenderPresent(renderer);
+				}
+
+				while (Check_Window == 4)
+				{
+					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
+					while (SDL_PollEvent(&event))
+					{
+						if (event.type == SDL_QUIT)
+						{
+							Check_Window = -1;
+							quit = 1;
+						}
+						if (event.type == SDL_MOUSEBUTTONDOWN && (event.button.button == SDL_BUTTON_LEFT))
+						{
+							for (int i = 0; i < 4; i++)
+							{
+								if (CheckMenuHit(SetButtons[i], event.button.x, event.button.y))
+								{
+									tapsound(Sound);
+									if (i == 3)	Check_Window = 0;
+									if (i == 1)
+									{
+										if (Music == 100) tempmusic = 0;
+										if (Music == 0) tempmusic = 100;
+										Music = tempmusic;
+										Mix_VolumeMusic(Music);
+									}
+									if (i == 0)
+									{
+										if (SoundTap == 100) tempsoundtap = 0;
+										if (SoundTap == 0) tempsoundtap = 100;
+										SoundTap = tempsoundtap;
+										Mix_Volume(-1, SoundTap);
 									}
 									std::cout << i << std::endl;
 								}
 							}
 						}
 					}
-					SDL_RenderPresent(renderer);
-				}
-				while (Check_Window == 4)
-				{
-					while (SDL_PollEvent(&event))
+					for (int i = 0; i < 4; i++)
 					{
-						if (event.type == SDL_QUIT)
-						{
-							Check_Window = -1;
-							quit = 1;
-						}
-						if (event.type == SDL_MOUSEBUTTONDOWN && (event.button.button == SDL_BUTTON_LEFT) || (event.button.button == SDL_BUTTON_RIGHT))
-						{
-							for (int i = 0; i < 5; i++)
-							{
-								if (CheckMenuHit(MenuButtons[i], event.button.x, event.button.y))
-								{
-									if (i == 4)
-									{
-										Check_Window = -1;
-										quit = 1;
-									}
-									std::cout << i << std::endl;
-								}
-							}
-						}
+						SDL_RenderCopy(renderer, SettingsBut[i], NULL, &SetButtons[i]);
 					}
 					SDL_RenderPresent(renderer);
 				}
 			}
+			for (int i = 0; i < 4; i++) SDL_DestroyTexture(SettingsBut[i]);
 			Mix_FreeMusic(fonmusic);
 			Mix_CloseAudio();
 			SDL_DestroyRenderer(renderer);
