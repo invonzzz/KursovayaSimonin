@@ -119,6 +119,33 @@ int main(int argc, char* argv[])
 					}
 					SDL_RenderPresent(renderer);
 				}
+				while (Check_Window == 4)
+				{
+					while (SDL_PollEvent(&event))
+					{
+						if (event.type == SDL_QUIT)
+						{
+							Check_Window = -1;
+							quit = 1;
+						}
+						if (event.type == SDL_MOUSEBUTTONDOWN && (event.button.button == SDL_BUTTON_LEFT) || (event.button.button == SDL_BUTTON_RIGHT))
+						{
+							for (int i = 0; i < 5; i++)
+							{
+								if (CheckMenuHit(MenuButtons[i], event.button.x, event.button.y))
+								{
+									if (i == 4)
+									{
+										Check_Window = -1;
+										quit = 1;
+									}
+									std::cout << i << std::endl;
+								}
+							}
+						}
+					}
+					SDL_RenderPresent(renderer);
+				}
 			}
 			Mix_FreeMusic(fonmusic);
 			Mix_CloseAudio();
