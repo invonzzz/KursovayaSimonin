@@ -25,8 +25,8 @@ struct Gems
 SDL_Texture* get_text_texture(SDL_Renderer*& renderer, char* text, TTF_Font* font, SDL_Color fore_color)
 {
 	SDL_Surface* textSurface = NULL;
-	SDL_Color back_color = { 40, 94, 42 };
-	textSurface = TTF_RenderText_Shaded(font, text, fore_color, back_color);
+	SDL_Color back_color = { 40, 94, 42};
+	textSurface = TTF_RenderText_Blended(font, text, fore_color);
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, textSurface);
 	SDL_FreeSurface(textSurface);
 	return texture;
@@ -119,16 +119,16 @@ int main(int argc, char* argv[])
 
 			TTF_Init();
 			my_font = TTF_OpenFont("arial.ttf", 100);
-			int time1 = 10, time2 = 20, time3 = 30;
+			int time1 = 0, time2 = 0, time3 = 0;
 			char time1txt[10], time2txt[10], time3txt[10];
 			char BestTime[55] = "Your best times: ";
 			_itoa_s(time1, time1txt, 10);
 			_itoa_s(time2, time2txt, 10);
 			_itoa_s(time3, time3txt, 10);
-			strcat_s(BestTime, time1txt);
-			strcat_s(BestTime, time2txt);
-			strcat_s(BestTime, time1txt);
-			SDL_Color BestTimeColor = { 0, 0, 0 };
+			strcat_s(BestTime, time1txt); strcat_s(BestTime, "s"); strcat_s(BestTime, " ");
+			strcat_s(BestTime, time2txt); strcat_s(BestTime, "s"); strcat_s(BestTime, " ");
+			strcat_s(BestTime, time3txt); strcat_s(BestTime, "s");
+			SDL_Color BestTimeColor = { 0, 0, 0};
 			SDL_Rect BestTimeRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
 			SDL_Texture* ResTexture = get_text_texture(renderer, BestTime, my_font, BestTimeColor);
 			SDL_Rect BackButtonRect = { W - SetButtons[3].w, H - SetButtons[3].h, 50, 50 };
