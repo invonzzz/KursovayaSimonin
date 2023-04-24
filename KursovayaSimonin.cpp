@@ -7,6 +7,8 @@
 #include "SDL_mixer.h"
 #include "SDL_image.h"
 #include <ctime>
+#include <fstream>
+#include <string>
 const int W = 700;
 const int H = 700;
 #define NumbPict 6
@@ -129,6 +131,13 @@ int main(int argc, char* argv[])
 			TTF_Init();
 			my_font = TTF_OpenFont("arial.ttf", 100);
 			int time1 = 0, time2 = 0, time3 = 0;
+			std::ifstream file;
+			file.open("Records.txt");
+			while (!file.eof()) 
+			{
+				file >> time1 >> time2 >> time3;
+			}
+			file.close();
 			char time1txt[10], time2txt[10], time3txt[10];
 			char BestTime[55] = "Your best times: ";
 			_itoa_s(time1, time1txt, 10);
