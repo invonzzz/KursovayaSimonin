@@ -49,15 +49,15 @@ void tapsound(Mix_Chunk* Sound)
 	Mix_PlayChannel(-1, Sound, 0);
 }
 
-void UploadPict(SDL_Renderer*& render, SDL_Surface* SurfImage[], int number, SDL_Texture* TexturImage[], Gems gems[])
-{
-	char numb[10];
-	_itoa_s(number, numb, 10);
-	strcat_s(numb, ".bmp");
-	SurfImage[number] = IMG_Load(numb);
-	TexturImage[number] = SDL_CreateTextureFromSurface(render, SurfImage[number]);
-	gems[number].GemTexture = TexturImage[number];
-}
+//void UploadPict(SDL_Renderer*& render, SDL_Surface* SurfImage[], int number, SDL_Texture* TexturImage[], Gems gems[])
+//{
+//	char numb[10];
+//	_itoa_s(number, numb, 10);
+//	strcat_s(numb, ".bmp");
+//	SurfImage[number] = IMG_Load(numb);
+//	TexturImage[number] = SDL_CreateTextureFromSurface(render, SurfImage[number]);
+//	gems[number].GemTexture = TexturImage[number];
+//}
 
 bool CheckMenuHit(SDL_Rect MenuButtons, int x, int y)
 {
@@ -90,6 +90,8 @@ int main(int argc, char* argv[])
 		else
 		{
 			renderer = SDL_CreateRenderer(window, -1, 0);
+
+
 			SDL_Surface* Fon = IMG_Load("fon.bmp");
 			SDL_Rect FonRect = { 0, 0, 0 + W, 0 + H };
 			SDL_Texture* TexturFon = SDL_CreateTextureFromSurface(renderer, Fon);
@@ -105,14 +107,21 @@ int main(int argc, char* argv[])
 			for (int i = 0; i < 5; i++) MenuButtons[i] = {MenuRect.x + 6, MenuRect.y + 6 + 80 * i, MenuRect.w - 12, 50};
 
 			SDL_Surface* SettingsButtons[4];
+
 			SettingsButtons[0] = IMG_Load("SoundButton.bmp");
+			SettingsButtons[1] = IMG_Load("MusicButton.bmp");
+			SettingsButtons[2] = IMG_Load("ScreenButton.bmp");
+			SettingsButtons[3] = IMG_Load("BackButton.bmp");
+			for (int i = 0; i < 4; i++)SettingsBut[i] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[i]);
+
+			/*SettingsButtons[0] = IMG_Load("SoundButton.bmp");
 			SettingsBut[0] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[0]);
 			SettingsButtons[1] = IMG_Load("MusicButton.bmp");
 			SettingsBut[1] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[1]);
 			SettingsButtons[2] = IMG_Load("ScreenButton.bmp");
 			SettingsBut[2] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[2]);
 			SettingsButtons[3] = IMG_Load("BackButton.bmp");
-			SettingsBut[3] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[3]);
+			SettingsBut[3] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[3]);*/
 			for (int i = 0; i < 4; i++) SDL_FreeSurface(SettingsButtons[i]);
 			SDL_Rect SetButtons[4];
 			for (int i = 0; i < 4; i++) SetButtons[i] = { W/4 + 100*i, H / 2, 50, 50};
@@ -256,7 +265,12 @@ int main(int argc, char* argv[])
 				}
 			}
 			for (int i = 0; i < 4; i++) SDL_DestroyTexture(SettingsBut[i]);
+			SDL_DestroyTexture(ResTexture);
+			SDL_DestroyTexture(TexturMenu);
+			TTF_CloseFont(my_font);
+			TTF_Quit();
 			Mix_FreeMusic(fonmusic);
+			Mix_FreeChunk(Sound);
 			Mix_CloseAudio();
 			SDL_DestroyRenderer(renderer);
 			SDL_DestroyWindow(window);
