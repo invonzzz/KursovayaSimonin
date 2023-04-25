@@ -13,6 +13,17 @@ const int W = 700;
 const int H = 700;
 #define NumbPict 6
 
+void RandomLevelGen(int level[][8])
+{
+	srand(time(NULL));
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			level[i][j] = rand() % 6;
+		}
+	}
+}
 struct Gems
 {
 	SDL_Texture* GemTexture;
@@ -50,6 +61,14 @@ void tapsound(Mix_Chunk* Sound)
 	Mix_PlayChannel(-1, Sound, 0);
 }
 
+bool CheckSecondTap(int i, int j, int i1, int j1)
+{
+	if (i == i1 + 1 && j == j1) return 1;
+	if (i == i1 - 1 && j == j1) return 1;
+	if (j == j1 + 1 && i == i1) return 1;
+	if (j == j1 - 1 && i == i1) return 1;
+	else return 0;
+}
 void UploadPict(SDL_Renderer*& render, SDL_Surface* SurfImage[], int number, SDL_Texture* TexturImage[], Gems gems[])
 {
 	char numb[10];
@@ -72,13 +91,14 @@ void UploadPict(SDL_Renderer*& render, SDL_Surface* SurfImage[], int number, SDL
 //	}
 //}
 
-void DrawCells(SDL_Renderer*& renderer, Gems gem[][8], Gems gems[])
+void DrawCells(SDL_Renderer*& renderer, Gems gem[][8], Gems gems[], int level[][8])
 {
+	srand(time(NULL));
 	for (int i = 0; i < 8; i++)
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			SDL_RenderCopy(renderer, gems[2].GemTexture, NULL, &gem[i][j].CardRect);
+			SDL_RenderCopy(renderer, gems[level[i][j]].GemTexture, NULL, &gem[i][j].CardRect);
 		}
 	}
 }
@@ -130,6 +150,15 @@ int main(int argc, char* argv[])
 			SDL_FreeSurface(Menu_Button);
 			SDL_Rect MenuButtons[5];
 			for (int i = 0; i < 5; i++) MenuButtons[i] = {MenuRect.x + 6, MenuRect.y + 6 + 80 * i, MenuRect.w - 12, 50};
+
+			int level1[8][8];
+			RandomLevelGen(level1);
+			int CheckCardOpeni = 0;
+			int CheckCardOpenj = 0;
+			int CheckCardOpeni2 = 0;
+			int CheckCardOpenj2 = 0;
+			int check2try = 0;
+			int temped[2];
 
 			SDL_Surface* SettingsButtons[4];
 
@@ -226,7 +255,7 @@ int main(int argc, char* argv[])
 									}
 									if (i == 3) Check_Window = 4;
 									if (i == 2) Check_Window = 3;
-									if (i == 1) Check_Window = 2;
+									//if (i == 1) Check_Window = 2;
 									if (i == 0) Check_Window = 1;
 								}
 							}
@@ -247,16 +276,48 @@ int main(int argc, char* argv[])
 						}
 						if (event.type == SDL_MOUSEBUTTONDOWN && (event.button.button == SDL_BUTTON_LEFT))
 						{
-							for (int i = 0; i < 5; i++)
+							if (event.type == SDL_MOUSEBUTTONDOWN && (event.button.button == SDL_BUTTON_LEFT))
 							{
-								if (CheckMenuHit(MenuButtons[i], event.button.x, event.button.y))
+								if (CheckMenuHit(BackButtonRect, event.button.x, event.button.y))
 								{
-									
+									tapsound(Sound);
+									Check_Window = 0;
+								}
+								for (int i = 0; i < 8; i++)
+								{
+									for (int j = 0; j < 8; j++)
+									{
+										if (CheckMenuHit(gem[i][j].CardRect, event.button.x, event.button.y))
+										{
+											if (check2try == 1 && CheckSecondTap(CheckCardOpeni, CheckCardOpenj, i, j))
+											{
+												CheckCardOpeni2 = i;
+												CheckCardOpenj2 = j;
+												check2try += 1;
+											}
+											if (check2try == 1 && !CheckSecondTap(CheckCardOpeni, CheckCardOpenj, i, j))
+											{
+												check2try = 0;
+											}
+											if (check2try == 0)
+											{
+												CheckCardOpeni = i;
+												CheckCardOpenj = j;
+											}
+											if (check2try == 0) check2try += 1;
+										}
+									}
 								}
 							}
 						}
 					}
-					DrawCells(renderer, gem, GemGame);
+					if (check2try == 2)
+					{
+						std::swap(level1[CheckCardOpeni][CheckCardOpenj], level1[CheckCardOpeni2][CheckCardOpenj2]);
+						check2try = 0;
+					}
+					DrawCells(renderer, gem, GemGame, level1);
+					SDL_RenderCopy(renderer, SettingsBut[3], NULL, &BackButtonRect);
 					SDL_RenderPresent(renderer);
 				}
 				while (Check_Window == 3)
