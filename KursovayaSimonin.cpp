@@ -69,6 +69,97 @@ bool CheckSecondTap(int i, int j, int i1, int j1)
 	if (j == j1 - 1 && i == i1) return 1;
 	else return 0;
 }
+bool CheckCombination(int level[][8], int i, int j, int i1, int j1)
+{
+	if (level[j][i] == level[j - 1][i] == level[j + 1][i]) return 1;
+	if (level[j][i] == level[j + 1][i] == level[i + 2][i]) return 1;
+	if (level[j][i] == level[j - 1][i] == level[j - 2][i]) return 1;
+
+	if (level[j1][i1] == level[j1 - 1][i1] == level[j1 + 1][i1]) return 1;
+	if (level[j1][i1] == level[j1 + 1][i1] == level[i1 + 2][i1]) return 1;
+	if (level[j1][i1] == level[j1 - 1][i1] == level[j1 - 2][i1]) return 1;
+
+	/*if (level[i1][j1] == level[i1 - 1][j1] == level[i1 + 1][j1]) return 1;
+	if (level[i1][j1] == level[i1 + 1][j1] == level[i1 + 2][j1]) return 1;
+	if (level[i1][j1] == level[i1 - 1][j1] == level[i1 - 2][j1]) return 1;*/
+
+	else return 0;
+}
+
+void CheckGeneration(int level[][8])
+{
+	int count = 0;
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			if (level[i][j] == 0)
+			{
+				count += 1;
+			}
+		}
+	}
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			if (level[i][j] == 0)
+			{
+				if (count > 1)
+				{
+					level[i][j] = rand() % (5 - 1 + 1) + 1;
+					count--;
+				}
+			}
+		}
+	}
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 6; j++)
+		{
+			if (level[i][j] == 0 && level[i][j+1] == level[i][j+2])
+			{
+				int temp = level[i][j+1];
+				while (temp == level[i][j+1]) level[i][j+1] = rand() % (5 - 1 + 1) + 1;
+			}
+		}
+	}
+	for (int i = 0; i < 6; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			if (level[i][j] == 0 && level[i+1][j] == level[i+2][j])
+			{
+				int temp = level[i+1][j];
+				while (temp == level[i+1][j]) level[i+1][j] = rand() % (5 - 1 + 1) + 1;
+			}
+		}
+	}
+	//ПРОВЕРКА 3 ОДИНАКОВЫХ
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 1; j < 7; j++)
+		{
+			if ((level[i][j] == level[i][j - 1]) && (level[i][j] == level[i][j + 1]))
+			{
+				int temp = level[i][j];
+				while (temp == level[i][j]) level[i][j] = rand() % (5 - 1 + 1) + 1;
+			}
+		}
+	}
+	//ПРОВЕРКА 3 ОДИНАКОВЫХ
+	for (int i = 1; i < 7; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			if ((level[i][j] == level[i - 1][j]) && (level[i][j] == level[i + 1][j]))
+			{
+				int temp = level[i][j];
+				while (temp == level[i][j]) level[i][j] = rand() % (5 - 1 + 1) + 1;
+			}
+		}
+	}
+}
 void UploadPict(SDL_Renderer*& render, SDL_Surface* SurfImage[], int number, SDL_Texture* TexturImage[], Gems gems[])
 {
 	char numb[10];
@@ -78,18 +169,6 @@ void UploadPict(SDL_Renderer*& render, SDL_Surface* SurfImage[], int number, SDL
 	TexturImage[number] = SDL_CreateTextureFromSurface(render, SurfImage[number]);
 	gems[number].GemTexture = TexturImage[number];
 }
-
-//void Grid(SDL_Renderer* render, Gems gem[])
-//{
-//	for (int i = 0; i < 8; i++)
-//	{
-//		for (int j = 0; j < 8; j++)
-//		{
-//			cards[j + 3 * i].CardRect = { 80 + i * 200, 50 + j * 200, 150, 150 };
-//			SDL_RenderCopy(render, cards[j + 3 * i].CardTexture, NULL, &cards[j + 3 * i].CardRect);
-//		}
-//	}
-//}
 
 void DrawCells(SDL_Renderer*& renderer, Gems gem[][8], Gems gems[], int level[][8])
 {
@@ -168,14 +247,6 @@ int main(int argc, char* argv[])
 			SettingsButtons[3] = IMG_Load("BackButton.bmp");
 			for (int i = 0; i < 4; i++)SettingsBut[i] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[i]);
 
-			/*SettingsButtons[0] = IMG_Load("SoundButton.bmp");
-			SettingsBut[0] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[0]);
-			SettingsButtons[1] = IMG_Load("MusicButton.bmp");
-			SettingsBut[1] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[1]);
-			SettingsButtons[2] = IMG_Load("ScreenButton.bmp");
-			SettingsBut[2] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[2]);
-			SettingsButtons[3] = IMG_Load("BackButton.bmp");
-			SettingsBut[3] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[3]);*/
 			for (int i = 0; i < 4; i++) SDL_FreeSurface(SettingsButtons[i]);
 			SDL_Rect SetButtons[4];
 			for (int i = 0; i < 4; i++) SetButtons[i] = { W/4 + 100*i, H / 2, 50, 50};
@@ -256,7 +327,12 @@ int main(int argc, char* argv[])
 									if (i == 3) Check_Window = 4;
 									if (i == 2) Check_Window = 3;
 									//if (i == 1) Check_Window = 2;
-									if (i == 0) Check_Window = 1;
+									if (i == 0)
+									{
+										Check_Window = 1;
+										RandomLevelGen(level1);
+										CheckGeneration(level1);
+									}
 								}
 							}
 						}
@@ -314,6 +390,15 @@ int main(int argc, char* argv[])
 					if (check2try == 2)
 					{
 						std::swap(level1[CheckCardOpeni][CheckCardOpenj], level1[CheckCardOpeni2][CheckCardOpenj2]);
+						for (int i = 0; i < 8; i++)
+						{
+							for (int j = 0; j < 8; j++)
+							{
+								std::cout << level1[j][i] << " ";
+							}
+							std::cout << "\n";
+						}
+						std::cout << CheckCombination(level1, CheckCardOpeni, CheckCardOpenj, CheckCardOpeni2, CheckCardOpenj2) << std::endl;
 						check2try = 0;
 					}
 					DrawCells(renderer, gem, GemGame, level1);
