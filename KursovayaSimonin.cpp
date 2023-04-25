@@ -113,28 +113,6 @@ void CheckGeneration(int level[][8])
 			}
 		}
 	}
-	for (int i = 0; i < 8; i++)
-	{
-		for (int j = 0; j < 6; j++)
-		{
-			if (level[i][j] == 0 && level[i][j+1] == level[i][j+2])
-			{
-				int temp = level[i][j+1];
-				while (temp == level[i][j+1]) level[i][j+1] = rand() % (5 - 1 + 1) + 1;
-			}
-		}
-	}
-	for (int i = 0; i < 6; i++)
-	{
-		for (int j = 0; j < 8; j++)
-		{
-			if (level[i][j] == 0 && level[i+1][j] == level[i+2][j])
-			{
-				int temp = level[i+1][j];
-				while (temp == level[i+1][j]) level[i+1][j] = rand() % (5 - 1 + 1) + 1;
-			}
-		}
-	}
 	//ПРОВЕРКА 3 ОДИНАКОВЫХ
 	for (int i = 0; i < 8; i++)
 	{
@@ -156,6 +134,50 @@ void CheckGeneration(int level[][8])
 			{
 				int temp = level[i][j];
 				while (temp == level[i][j]) level[i][j] = rand() % (5 - 1 + 1) + 1;
+			}
+		}
+	}
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 6; j++)
+		{
+			if ((level[i][j] == 0) && (level[i][j + 1] == level[i][j + 2]))
+			{
+				int temp = level[i][j + 1];
+				while (temp == level[i][j + 1]) level[i][j + 1] = rand() % (5 - 1 + 1) + 1;
+			}
+		}
+	}
+	for (int i = 0; i < 6; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			if ((level[i][j] == 0) && (level[i + 1][j] == level[i + 2][j]))
+			{
+				int temp = level[i + 1][j];
+				while (temp == level[i + 1][j]) level[i + 1][j] = rand() % (5 - 1 + 1) + 1;
+			}
+		}
+	}
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 1; j < 7; j++)
+		{
+			if ((level[i][j] == 0) && (level[i][j + 1] == level[i][j - 1]))
+			{
+				int temp = level[i][j - 1];
+				while (temp == level[i][j - 1]) level[i][j - 1] = rand() % (5 - 1 + 1) + 1;
+			}
+		}
+	}
+	for (int i = 0; i < 7; i++)
+	{
+		for (int j = 1; j < 8; j++)
+		{
+			if ((level[i][j] == 0) && (level[i + 1][j] == level[i - 1][j]))
+			{
+				int temp = level[i - 1][j];
+				while (temp == level[i - 1][j]) level[i - 1][j] = rand() % (5 - 1 + 1) + 1;
 			}
 		}
 	}
