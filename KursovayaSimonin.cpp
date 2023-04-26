@@ -60,6 +60,11 @@ void tapsound(Mix_Chunk* Sound)
 	Sound = Mix_LoadWAV("tap_sound.wav");
 	Mix_PlayChannel(-1, Sound, 0);
 }
+void wrongtapsound(Mix_Chunk* Sound)
+{
+	Sound = Mix_LoadWAV("wrong.wav");
+	Mix_PlayChannel(-1, Sound, 0);
+}
 
 bool CheckSecondTap(int i, int j, int i1, int j1)
 {
@@ -69,56 +74,56 @@ bool CheckSecondTap(int i, int j, int i1, int j1)
 	if (j == j1 - 1 && i == i1) return 1;
 	else return 0;
 }
-int CheckCombinationLeftRight(int level[][8], int j, int i, int j1, int i1)
+int CheckCombinationLeftRight(int level[][8], int j1, int i1)
 {
 	int countcombright = 0;
 	int countcombleft = 0;
 	for (int q = 1; q <= 7-j1; q++)
 	{
-		if (level[j1 + q][i1] == level[j1][i1])
+		if ((level[j1 + q][i1] == level[j1][i1]) || (level[j1 + q][i1] == 0))
 		{
 			countcombright += 1;
 		}
-		if (level[j1 + q][i1] != level[j1][i1])
+		if ((level[j1 + q][i1] != level[j1][i1]) && (level[j1 + q][i1] != 0))
 		{
 			break;
 		}
 	}
 	for (int q = 1; q <= j1; q++)
 	{
-		if (level[j1 - q][i1] == level[j1][i1])
+		if ((level[j1 - q][i1] == level[j1][i1]) || (level[j1 - q][i1] == 0))
 		{
 			countcombleft += 1;
 		}
-		if (level[j1 - q][i1] != level[j1][i1])
+		if ((level[j1 - q][i1] != level[j1][i1]) && (level[j1 - q][i1] != 0))
 		{
 			break;
 		}
 	}
 	return countcombleft + countcombright + 1;
 }
-int CheckCombinationUpDown(int level[][8], int j, int i, int j1, int i1)
+int CheckCombinationUpDown(int level[][8], int j1, int i1)
 {
 	int countcombup = 0;
 	int countcombdown = 0;
 	for (int q = 1; q <= 7 - i1; q++)
 	{
-		if (level[j1][i1+q] == level[j1][i1])
+		if ((level[j1][i1+q] == level[j1][i1]) || (level[j1][i1 + q] == 0))
 		{
 			countcombup += 1;
 		}
-		if (level[j1][i1+q] != level[j1][i1])
+		if ((level[j1][i1+q] != level[j1][i1]) && (level[j1][i1 + q] != 0))
 		{
 			break;
 		}
 	}
 	for (int q = 1; q <= i1; q++)
 	{
-		if (level[j1][i1-q] == level[j1][i1])
+		if ((level[j1][i1-q] == level[j1][i1]) || (level[j1][i1 - q] == 0))
 		{
 			countcombdown += 1;
 		}
-		if (level[j1][i1-q] != level[j1][i1])
+		if ((level[j1][i1-q] != level[j1][i1]) && (level[j1][i1 - q] != 0))
 		{
 			break;
 		}
@@ -337,7 +342,7 @@ int main(int argc, char* argv[])
 			SDL_Rect BackButtonRect = { W - SetButtons[3].w, H - SetButtons[3].h, 50, 50 };
 			
 			int Music = 100, tempmusic;
-			int SoundTap = 100, tempsoundtap;
+			int SoundTap = 50, tempsoundtap;
 			Mix_Init(0);
 			Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024);
 			Mix_VolumeMusic(Music);
@@ -451,23 +456,24 @@ int main(int argc, char* argv[])
 					}
 					if (check2try == 2)
 					{
-						int checkcomb = 0;
+						int checkcomb1 = 0;
+						int checkcomb2 = 0;
 						std::swap(level1[CheckCardOpeni][CheckCardOpenj], level1[CheckCardOpeni2][CheckCardOpenj2]);
-						/*std::cout << CheckCardOpenj << " " << CheckCardOpeni << std::endl;
-						std::cout << CheckCardOpenj2 << " " << CheckCardOpeni2 << std::endl;*/
-						/*for (int i = 0; i < 8; i++)
+						
+						//Первая нажатая фигура
+						if (CheckCombinationLeftRight(level1, CheckCardOpeni2, CheckCardOpenj2) <= 2) checkcomb1 += 1;
+						if (CheckCombinationUpDown(level1, CheckCardOpeni2, CheckCardOpenj2) <= 2) checkcomb1 += 1;
+
+						//Вторая нажатая фигура
+						if (CheckCombinationLeftRight(level1, CheckCardOpeni, CheckCardOpenj) <= 2) checkcomb2 += 1;
+						if (CheckCombinationUpDown(level1, CheckCardOpeni, CheckCardOpenj) <= 2) checkcomb2 += 1;
+
+
+						if ((checkcomb1 > 1) && (checkcomb2 > 1))
 						{
-							for (int j = 0; j < 8; j++)
-							{
-								std::cout << level1[j][i] << " ";
-							}
-							std::cout << "\n";
+							wrongtapsound(Sound);
+							std::swap(level1[CheckCardOpeni][CheckCardOpenj], level1[CheckCardOpeni2][CheckCardOpenj2]);
 						}
-						std::cout << CheckCombinationLeftRight(level1, CheckCardOpeni, CheckCardOpenj, CheckCardOpeni2, CheckCardOpenj2) << std::endl;
-						std::cout << CheckCombinationUpDown(level1, CheckCardOpeni, CheckCardOpenj, CheckCardOpeni2, CheckCardOpenj2) << std::endl;*/
-						if (CheckCombinationLeftRight(level1, CheckCardOpeni, CheckCardOpenj, CheckCardOpeni2, CheckCardOpenj2) <= 2) checkcomb += 1;
-						if (CheckCombinationUpDown(level1, CheckCardOpeni, CheckCardOpenj, CheckCardOpeni2, CheckCardOpenj2) <= 2) checkcomb += 1;
-						if (checkcomb > 1) std::swap(level1[CheckCardOpeni][CheckCardOpenj], level1[CheckCardOpeni2][CheckCardOpenj2]);
 						check2try = 0;
 					}
 					DrawCells(renderer, gem, GemGame, level1);
@@ -517,8 +523,8 @@ int main(int argc, char* argv[])
 									tapsound(Sound);
 									if (i == 0)
 									{
-										if (SoundTap == 100) tempsoundtap = 0;
-										if (SoundTap == 0) tempsoundtap = 100;
+										if (SoundTap == 50) tempsoundtap = 0;
+										if (SoundTap == 0) tempsoundtap = 50;
 										SoundTap = tempsoundtap;
 										Mix_Volume(-1, SoundTap);
 									}
