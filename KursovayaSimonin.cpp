@@ -135,7 +135,7 @@ int CheckCombinationRight(int level[][8], int j1, int i1)
 	}
 	return countcombright;
 }
-int CheckCombinationUp(int level[][8], int j1, int i1)
+int CheckCombinationDown(int level[][8], int j1, int i1)
 {
 	int countcombup = 0;
 	for (int q = 1; q <= 7 - i1; q++)
@@ -151,7 +151,7 @@ int CheckCombinationUp(int level[][8], int j1, int i1)
 	}
 	return countcombup;
 }
-int CheckCombinationDown(int level[][8], int j1, int i1)
+int CheckCombinationUp(int level[][8], int j1, int i1)
 {
 	int countcombdown = 0;
 	for (int q = 1; q <= i1; q++)
@@ -167,10 +167,6 @@ int CheckCombinationDown(int level[][8], int j1, int i1)
 	}
 	return countcombdown;
 }
-
-
-
-
 int CheckCombinationUpDown(int level[][8], int j1, int i1)
 {
 	int countcombup = 0;
@@ -231,7 +227,9 @@ void BrokeLeftRight(int level[][8], int stolb, int begin, int end)
 }
 void BrokeUpDown(int level[][8], int stolb, int begin, int end)
 {
+	std::cout << begin << " " << end << std::endl;
 	int temp[8][8];
+	int freegems = begin; //5
 	for (int i = 0; i < 8; i++)
 	{
 		for (int j = 0; j < 8; j++)
@@ -239,9 +237,39 @@ void BrokeUpDown(int level[][8], int stolb, int begin, int end)
 			temp[i][j] = level[j][i];
 		}
 	}
-	for (int i = begin; i <= end; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		temp[i][stolb];
+		for (int j = 0; j < 8; j++)
+		{
+			std::cout << temp[i][j] << " ";
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+	/*for (int i = 0; i < freegems; i++)
+	{
+		temp[end - i][stolb] = temp[begin - i - 1][stolb];
+	}*/
+	for (int i = 0; i <= end; i++)
+	{
+		if (i < freegems) temp[end - i][stolb] = temp[begin - i - 1][stolb];
+		else temp[end - i][stolb] = rand() % (5 - 1 + 1) + 1;
+	}
+
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			std::cout << temp[i][j] << " ";
+		}
+		std::cout << std::endl;
+	}
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			level[j][i] = temp[i][j];
+		}
 	}
 }
 
@@ -575,8 +603,8 @@ int main(int argc, char* argv[])
 						int checkcomb1 = 0;
 						int checkcomb2 = 0;
 						std::swap(level1[CheckCardOpeni][CheckCardOpenj], level1[CheckCardOpeni2][CheckCardOpenj2]);
-						/*std::cout << CheckCardOpenj << " " << CheckCardOpeni << std::endl;
-						std::cout << CheckCardOpenj2 << " " << CheckCardOpeni2 << std::endl;*/
+						std::cout << CheckCardOpenj << " " << CheckCardOpeni << std::endl;
+						std::cout << CheckCardOpenj2 << " " << CheckCardOpeni2 << std::endl;
 						//Первая нажатая фигура
 						if (CheckCombinationLeft(level1, CheckCardOpeni2, CheckCardOpenj2) + CheckCombinationRight(level1, CheckCardOpeni2, CheckCardOpenj2) < 2) checkcomb1 += 1;
 						else
@@ -592,6 +620,11 @@ int main(int argc, char* argv[])
 							points2 = CheckCombinationUpDown(level1, CheckCardOpeni2, CheckCardOpenj2);
 							int BrokenStolbBegin = CheckCardOpenj2 - CheckCombinationUp(level1, CheckCardOpeni2, CheckCardOpenj2);
 							int BrokenStolbEnd = CheckCardOpenj2 + CheckCombinationDown(level1, CheckCardOpeni2, CheckCardOpenj2);
+							std::cout << "CheckCardOpenj2: " << CheckCardOpenj2 << std::endl;
+							std::cout << "Begin: " << BrokenStolbBegin << std::endl;
+							std::cout << "End: " << BrokenStolbEnd << std::endl;
+							std::cout << "CheckCombinationUp: " << CheckCombinationUp(level1, CheckCardOpeni2, CheckCardOpenj2) << std::endl;
+							std::cout << "CheckCombinationDown: " << CheckCombinationDown(level1, CheckCardOpeni2, CheckCardOpenj2) << std::endl;
 							BrokeUpDown(level1, CheckCardOpeni2, BrokenStolbBegin, BrokenStolbEnd);
 						}
 
