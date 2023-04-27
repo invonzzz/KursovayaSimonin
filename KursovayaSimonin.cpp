@@ -581,8 +581,6 @@ int main(int argc, char* argv[])
 						int checkcomb1 = 0;
 						int checkcomb2 = 0;
 						std::swap(level1[CheckCardOpeni][CheckCardOpenj], level1[CheckCardOpeni2][CheckCardOpenj2]);
-						/*std::cout << CheckCardOpenj << " " << CheckCardOpeni << std::endl;
-						std::cout << CheckCardOpenj2 << " " << CheckCardOpeni2 << std::endl;*/
 						//Первая нажатая фигура
 						if (CheckCombinationLeft(level1, CheckCardOpeni2, CheckCardOpenj2) + CheckCombinationRight(level1, CheckCardOpeni2, CheckCardOpenj2) < 2) checkcomb1 += 1;
 						else
@@ -625,10 +623,7 @@ int main(int argc, char* argv[])
 							wrongtapsound(Sound);
 							std::swap(level1[CheckCardOpeni][CheckCardOpenj], level1[CheckCardOpeni2][CheckCardOpenj2]);
 						}
-						else
-						{
-							tapsound(Sound);
-						}
+						else tapsound(Sound);
 						std::cout << points*100 << std::endl;
 						check2try = 0;
 					}
