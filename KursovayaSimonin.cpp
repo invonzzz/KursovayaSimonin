@@ -489,7 +489,7 @@ int main(int argc, char* argv[])
 			
 			int numberlevel = 0;
 			levels Lvl[5];
-			Lvl[0].PointsLevel = 300; Lvl[0].TimeLevel = 15; //3000
+			Lvl[0].PointsLevel = 3000; Lvl[0].TimeLevel = 15; //3000
 			Lvl[1].PointsLevel = 400; Lvl[1].TimeLevel = 17; //4500
 			Lvl[2].PointsLevel = 600; Lvl[2].TimeLevel = 175; //6000
 			Lvl[3].PointsLevel = 800; Lvl[3].TimeLevel = 200; //8000
@@ -596,16 +596,6 @@ int main(int argc, char* argv[])
 						SDL_DestroyTexture(TimerTexture);
 						TimerTexture = get_text_texture(renderer, leveltime, my_font, TimerColor);
 					}
-					if (level1time == 0)
-					{
-						losesound(Sound);
-						points = 0;
-						numberlevel = 0;
-						TimeStartProgram2 = 0;
-						SDL_DestroyTexture(PointsTexture);
-						SDL_DestroyTexture(TimerTexture);
-						Check_Window = 0;
-					}
 					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
 					SDL_RenderCopy(renderer, TexturBackNumb, NULL, &PointsRect);
 					SDL_RenderCopy(renderer, TexturBackNumb, NULL, &TimerRect);
@@ -626,7 +616,7 @@ int main(int argc, char* argv[])
 									numberlevel = 0;
 									TimeStartProgram2 = 0;
 									SDL_DestroyTexture(PointsTexture);
-									SDL_DestroyTexture(TimerTexture);
+									//SDL_DestroyTexture(TimerTexture);
 									Check_Window = 0;
 								}
 								for (int i = 0; i < 8; i++)
@@ -722,9 +712,20 @@ int main(int argc, char* argv[])
 						points = 0;
 						_itoa_s(points, Points, 10);
 						SDL_DestroyTexture(PointsTexture);
+						//SDL_DestroyTexture(TimerTexture);
 						PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
 						RandomLevelGen(level1);
 						CheckGeneration(level1);
+					}
+					if (level1time == 0)
+					{
+						losesound(Sound);
+						points = 0;
+						numberlevel = 0;
+						TimeStartProgram2 = 0;
+						SDL_DestroyTexture(PointsTexture);
+						//SDL_DestroyTexture(TimerTexture);
+						Check_Window = 0;
 					}
 					if (numberlevel > 4)
 					{
@@ -834,6 +835,7 @@ int main(int argc, char* argv[])
 				}
 			}
 			for (int i = 0; i < 4; i++) SDL_DestroyTexture(SettingsBut[i]);
+			for (int i = 0; i < 6; i++) SDL_DestroyTexture(TexturImage[i]);
 			SDL_DestroyTexture(ResTexture);
 			SDL_DestroyTexture(TexturMenu);
 			SDL_DestroyTexture(TexturBackNumb);
