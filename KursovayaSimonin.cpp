@@ -12,18 +12,24 @@
 const int W = 700;
 const int H = 700;
 #define NumbPict 6
+#define Setka 8
 
 void RandomLevelGen(int level[][8])
 {
 	srand(time(NULL));
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < Setka; i++)
 	{
-		for (int j = 0; j < 8; j++)
+		for (int j = 0; j < Setka; j++)
 		{
 			level[i][j] = rand() % 6;
 		}
 	}
 }
+struct levels
+{
+	int TimeLevel;
+	int PointsLevel;
+};
 struct Gems
 {
 	SDL_Texture* GemTexture;
@@ -34,15 +40,6 @@ SDL_Texture* get_text_texture(SDL_Renderer*& renderer, char* text, TTF_Font* fon
 {
 	SDL_Surface* textSurface = NULL;
 	textSurface = TTF_RenderText_Blended(font, text, fore_color);
-	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, textSurface);
-	SDL_FreeSurface(textSurface);
-	return texture;
-}
-SDL_Texture* get_text_textureBack(SDL_Renderer*& renderer, char* text, TTF_Font* font, SDL_Color fore_color)
-{
-	SDL_Surface* textSurface = NULL;
-	SDL_Color back_color = { 0, 0, 0 };
-	textSurface = TTF_RenderText_Shaded(font, text, fore_color, back_color);
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, textSurface);
 	SDL_FreeSurface(textSurface);
 	return texture;
@@ -106,7 +103,6 @@ int CheckCombinationLeftRight(int level[][8], int j1, int i1)
 	}
 	return countcombleft + countcombright + 1;
 }
-
 int CheckCombinationLeft(int level[][8], int j1, int i1)
 {
 	int countcombleft = 0;
@@ -199,7 +195,6 @@ int CheckCombinationUpDown(int level[][8], int j1, int i1)
 	}
 	return countcombdown + countcombup + 1;
 }
-
 void BrokeLeftRight(int level[][8], int stolb, int begin, int end)
 {
 	int temp[8][8];
@@ -387,6 +382,7 @@ void SetBut(SDL_Renderer* render, SDL_Rect SettingsButtons[])
 	}
 }
 
+
 int main(int argc, char* argv[])
 {
 	SDL_Renderer* renderer = NULL;
@@ -405,11 +401,11 @@ int main(int argc, char* argv[])
 		{
 			renderer = SDL_CreateRenderer(window, -1, 0);
 
-
 			SDL_Surface* Fon = IMG_Load("fon.bmp");
 			SDL_Rect FonRect = { 0, 0, 0 + W, 0 + H };
 			SDL_Texture* TexturFon = SDL_CreateTextureFromSurface(renderer, Fon);
 			SDL_FreeSurface(Fon);
+			Fon = nullptr;
 			SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
 
 			SDL_Surface* Menu_Button = IMG_Load("menu.bmp");
@@ -424,18 +420,14 @@ int main(int argc, char* argv[])
 			SDL_SetColorKey(BackNumb, SDL_TRUE, SDL_MapRGB(BackNumb->format, 255, 255, 255));
 			SDL_Texture* TexturBackNumb = SDL_CreateTextureFromSurface(renderer, BackNumb);
 			SDL_FreeSurface(BackNumb);
+			BackNumb = nullptr;
 
 			SDL_Surface* grid = IMG_Load("grid.bmp");
 			SDL_Texture* TexturGrid = SDL_CreateTextureFromSurface(renderer, grid);
 			SDL_FreeSurface(grid);
+			grid = nullptr;
 			SDL_Rect GridRect = { W / 4 - 25, H / 4 - 25, 400, 400 };
 
-			int points = 0;
-			char Points[10];
-			_itoa_s(points, Points, 10);
-			SDL_Rect PointsRect = { 50, 50, 150, 50 };
-			SDL_Color PointsColor = { 49, 125, 37 };
-			SDL_Texture* PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
 			int level1[8][8];
 			RandomLevelGen(level1);
 			int CheckCardOpeni = 0;
@@ -444,13 +436,21 @@ int main(int argc, char* argv[])
 			int CheckCardOpenj2 = 0;
 			int check2try = 0;
 
+			int TimeStartProgram;
+			int TimeStartProgram2 = 0;
+			int TimeStartGame;
+
 			SDL_Surface* SettingsButtons[4];
 			SettingsButtons[0] = IMG_Load("SoundButton.bmp");
 			SettingsButtons[1] = IMG_Load("MusicButton.bmp");
 			SettingsButtons[2] = IMG_Load("ScreenButton.bmp");
 			SettingsButtons[3] = IMG_Load("BackButton.bmp");
 			for (int i = 0; i < 4; i++)SettingsBut[i] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[i]);
-			for (int i = 0; i < 4; i++) SDL_FreeSurface(SettingsButtons[i]);
+			for (int i = 0; i < 4; i++)
+			{
+				SDL_FreeSurface(SettingsButtons[i]);
+				SettingsButtons[i] = nullptr;
+			}
 			SDL_Rect SetButtons[4];
 			for (int i = 0; i < 4; i++) SetButtons[i] = { W/4 + 100*i, H / 2, 50, 50};
 
@@ -476,7 +476,37 @@ int main(int argc, char* argv[])
 			SDL_Rect BestTimeRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
 			SDL_Texture* ResTexture = get_text_texture(renderer, BestTime, my_font, BestTimeColor);
 			SDL_Rect BackButtonRect = { W - SetButtons[3].w, H - SetButtons[3].h, 50, 50 };
+
+			char WinMessage[55] = "Graz!!! You Win! ";
+			SDL_Rect WinMessageRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
+			SDL_Color WinMessageColor = { 0, 0, 0};
+			SDL_Texture* WinMessageTexture = get_text_texture(renderer, WinMessage, my_font, WinMessageColor);
 			
+			int numberlevel = 0;
+			levels Lvl[5];
+			Lvl[0].PointsLevel = 300; Lvl[0].TimeLevel = 120; //3000
+			Lvl[1].PointsLevel = 400; Lvl[1].TimeLevel = 150; //4500
+			Lvl[2].PointsLevel = 600; Lvl[2].TimeLevel = 175; //6000
+			Lvl[3].PointsLevel = 800; Lvl[3].TimeLevel = 200; //8000
+			Lvl[4].PointsLevel = 1000; Lvl[4].TimeLevel = 250; //10000
+
+			int points = 0;
+			char Points[10];
+			_itoa_s(points, Points, 10);
+			SDL_Rect PointsRect = { 50, 50, 150, 50 };
+			SDL_Color PointsColor = { 49, 125, 37 };
+			SDL_Texture* PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
+
+			int level1time = 120;
+			char leveltime[10];
+			_itoa_s(level1time, leveltime, 10);
+			SDL_Rect TimerRect = { 250, 50, 150, 50 };
+			SDL_Color TimerColor = { 49, 125, 37 };
+			SDL_Texture* TimerTexture = get_text_texture(renderer, leveltime, my_font, TimerColor);
+
+			int PointsForWin = Lvl[0].PointsLevel;
+			char PointsToWin[10];
+			_itoa_s(PointsForWin, PointsToWin, 10);
 			int Music = 100, tempmusic;
 			int SoundTap = 50, tempsoundtap;
 			Mix_Init(0);
@@ -489,7 +519,11 @@ int main(int argc, char* argv[])
 			for (int i = 0; i < 6; i++) UploadPict(renderer, SurfImage, i, TexturImage, GemGame);
 			for (int i = 0; i < 6; i++) SDL_SetColorKey(SurfImage[i], SDL_TRUE, SDL_MapRGB(SurfImage[i]->format, 255, 255, 255));
 			for (int i = 0; i < 6; i++) GemGame[i].GemTexture = SDL_CreateTextureFromSurface(renderer, SurfImage[i]);
-			for (int i = 0; i < 6; i++) SDL_FreeSurface(SurfImage[i]);
+			for (int i = 0; i < 6; i++)
+			{
+				SDL_FreeSurface(SurfImage[i]);
+				SurfImage[i] = nullptr;
+			}
 
 			Gems gem[8][8];
 			for (int i = 0; i < 8; i++)
@@ -532,6 +566,7 @@ int main(int argc, char* argv[])
 									//if (i == 1) Check_Window = 2;
 									if (i == 0)
 									{
+										TimeStartGame = (SDL_GetTicks() / 1000);
 										Check_Window = 1;
 										RandomLevelGen(level1);
 										CheckGeneration(level1);
@@ -546,6 +581,15 @@ int main(int argc, char* argv[])
 				}
 				while (Check_Window == 1)
 				{
+					TimeStartProgram = (SDL_GetTicks() / 1000) - TimeStartGame;
+					if (TimeStartProgram2 != TimeStartProgram)
+					{
+						TimeStartProgram2 = TimeStartProgram;
+						level1time -= 1;
+						_itoa_s(level1time, leveltime, 10);
+						SDL_DestroyTexture(TimerTexture);
+						TimerTexture = get_text_texture(renderer, leveltime, my_font, TimerColor);
+					}
 					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
 					SDL_RenderCopy(renderer, TexturBackNumb, NULL, &PointsRect);
 					SDL_RenderCopy(renderer, TexturGrid, NULL, &GridRect);
@@ -562,6 +606,7 @@ int main(int argc, char* argv[])
 								{
 									tapsound(Sound);
 									points = 0;
+									numberlevel = 0;
 									SDL_DestroyTexture(PointsTexture);
 									Check_Window = 0;
 								}
@@ -646,15 +691,32 @@ int main(int argc, char* argv[])
 						}
 						else tapsound(Sound);
 
-						std::cout << points << std::endl;
 						_itoa_s(points, Points, 10);
 						SDL_DestroyTexture(PointsTexture);
 						PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
 						check2try = 0;
 					}
+					if (points >= Lvl[numberlevel].PointsLevel)
+					{
+						numberlevel++;
+						points = 0;
+						_itoa_s(points, Points, 10);
+						SDL_DestroyTexture(PointsTexture);
+						PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
+						RandomLevelGen(level1);
+						CheckGeneration(level1);
+					}
+					if (numberlevel > 4)
+					{
+						numberlevel = 0;
+						points = 0;
+						SDL_DestroyTexture(PointsTexture);
+						Check_Window = 5;
+					}
 					DrawCells(renderer, gem, GemGame, level1);
 					SDL_RenderCopy(renderer, SettingsBut[3], NULL, &BackButtonRect);
 					draw_text(renderer, PointsTexture, PointsRect);
+					draw_text(renderer, TimerTexture, TimerRect);
 					SDL_RenderPresent(renderer);
 				}
 				while (Check_Window == 3)
@@ -725,6 +787,29 @@ int main(int argc, char* argv[])
 					{
 						SDL_RenderCopy(renderer, SettingsBut[i], NULL, &SetButtons[i]);
 					}
+					SDL_RenderPresent(renderer);
+				}
+				while (Check_Window == 5)
+				{
+					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
+					while (SDL_PollEvent(&event))
+					{
+						if (event.type == SDL_QUIT)
+						{
+							Check_Window = -1;
+							quit = 1;
+						}
+						if (event.type == SDL_MOUSEBUTTONDOWN && (event.button.button == SDL_BUTTON_LEFT))
+						{
+							if (CheckMenuHit(BackButtonRect, event.button.x, event.button.y))
+							{
+								tapsound(Sound);
+								Check_Window = 0;
+							}
+						}
+					}
+					draw_text(renderer, WinMessageTexture, WinMessageRect);
+					SDL_RenderCopy(renderer, SettingsBut[3], NULL, &BackButtonRect);
 					SDL_RenderPresent(renderer);
 				}
 			}
