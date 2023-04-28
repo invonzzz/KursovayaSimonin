@@ -33,8 +33,16 @@ struct Gems
 SDL_Texture* get_text_texture(SDL_Renderer*& renderer, char* text, TTF_Font* font, SDL_Color fore_color)
 {
 	SDL_Surface* textSurface = NULL;
-	SDL_Color back_color = { 40, 94, 42};
 	textSurface = TTF_RenderText_Blended(font, text, fore_color);
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, textSurface);
+	SDL_FreeSurface(textSurface);
+	return texture;
+}
+SDL_Texture* get_text_textureBack(SDL_Renderer*& renderer, char* text, TTF_Font* font, SDL_Color fore_color)
+{
+	SDL_Surface* textSurface = NULL;
+	SDL_Color back_color = { 0, 0, 0 };
+	textSurface = TTF_RenderText_Shaded(font, text, fore_color, back_color);
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, textSurface);
 	SDL_FreeSurface(textSurface);
 	return texture;
@@ -412,7 +420,22 @@ int main(int argc, char* argv[])
 			SDL_Rect MenuButtons[5];
 			for (int i = 0; i < 5; i++) MenuButtons[i] = {MenuRect.x + 6, MenuRect.y + 6 + 80 * i, MenuRect.w - 12, 50};
 
+			SDL_Surface* BackNumb = IMG_Load("BackNumb.bmp");
+			SDL_SetColorKey(BackNumb, SDL_TRUE, SDL_MapRGB(BackNumb->format, 255, 255, 255));
+			SDL_Texture* TexturBackNumb = SDL_CreateTextureFromSurface(renderer, BackNumb);
+			SDL_FreeSurface(BackNumb);
+
+			SDL_Surface* grid = IMG_Load("grid.bmp");
+			SDL_Texture* TexturGrid = SDL_CreateTextureFromSurface(renderer, grid);
+			SDL_FreeSurface(grid);
+			SDL_Rect GridRect = { W / 4 - 25, H / 4 - 25, 400, 400 };
+
 			int points = 0;
+			char Points[10];
+			_itoa_s(points, Points, 10);
+			SDL_Rect PointsRect = { 50, 50, 150, 50 };
+			SDL_Color PointsColor = { 49, 125, 37 };
+			SDL_Texture* PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
 			int level1[8][8];
 			RandomLevelGen(level1);
 			int CheckCardOpeni = 0;
@@ -422,13 +445,11 @@ int main(int argc, char* argv[])
 			int check2try = 0;
 
 			SDL_Surface* SettingsButtons[4];
-
 			SettingsButtons[0] = IMG_Load("SoundButton.bmp");
 			SettingsButtons[1] = IMG_Load("MusicButton.bmp");
 			SettingsButtons[2] = IMG_Load("ScreenButton.bmp");
 			SettingsButtons[3] = IMG_Load("BackButton.bmp");
 			for (int i = 0; i < 4; i++)SettingsBut[i] = SDL_CreateTextureFromSurface(renderer, SettingsButtons[i]);
-
 			for (int i = 0; i < 4; i++) SDL_FreeSurface(SettingsButtons[i]);
 			SDL_Rect SetButtons[4];
 			for (int i = 0; i < 4; i++) SetButtons[i] = { W/4 + 100*i, H / 2, 50, 50};
@@ -475,7 +496,7 @@ int main(int argc, char* argv[])
 			{
 				for (int j = 0; j < 8; j++)
 				{
-					gem[i][j].CardRect = { W/4 - 25 + 50 * i, W/4 - 25 + 50 * j, 50, 50 };
+					gem[i][j].CardRect = { W/4 - 25 + 50 * i, H/4 - 25 + 50 * j, 50, 50 };
 				}
 			}
 			
@@ -526,6 +547,8 @@ int main(int argc, char* argv[])
 				while (Check_Window == 1)
 				{
 					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
+					SDL_RenderCopy(renderer, TexturBackNumb, NULL, &PointsRect);
+					SDL_RenderCopy(renderer, TexturGrid, NULL, &GridRect);
 					while (SDL_PollEvent(&event))
 					{
 						if (event.type == SDL_QUIT)
@@ -535,12 +558,11 @@ int main(int argc, char* argv[])
 						}
 						if (event.type == SDL_MOUSEBUTTONDOWN && (event.button.button == SDL_BUTTON_LEFT))
 						{
-							if (event.type == SDL_MOUSEBUTTONDOWN && (event.button.button == SDL_BUTTON_LEFT))
-							{
 								if (CheckMenuHit(BackButtonRect, event.button.x, event.button.y))
 								{
 									tapsound(Sound);
 									points = 0;
+									SDL_DestroyTexture(PointsTexture);
 									Check_Window = 0;
 								}
 								for (int i = 0; i < 8; i++)
@@ -572,7 +594,6 @@ int main(int argc, char* argv[])
 										}
 									}
 								}
-							}
 						}
 					}
 					if (check2try == 2)
@@ -617,18 +638,23 @@ int main(int argc, char* argv[])
 							int BrokenStolbEnd = CheckCardOpenj + CheckCombinationDown(level1, CheckCardOpeni, CheckCardOpenj);
 							BrokeUpDown(level1, CheckCardOpeni, BrokenStolbBegin, BrokenStolbEnd);
 						}
-						points += points1 + points2 + points3 + points4;
+						points += 100* points1 + 100*points2 + 100*points3 + 100*points4;
 						if ((checkcomb1 > 1) && (checkcomb2 > 1))
 						{
 							wrongtapsound(Sound);
 							std::swap(level1[CheckCardOpeni][CheckCardOpenj], level1[CheckCardOpeni2][CheckCardOpenj2]);
 						}
 						else tapsound(Sound);
-						std::cout << points*100 << std::endl;
+
+						std::cout << points << std::endl;
+						_itoa_s(points, Points, 10);
+						SDL_DestroyTexture(PointsTexture);
+						PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
 						check2try = 0;
 					}
 					DrawCells(renderer, gem, GemGame, level1);
 					SDL_RenderCopy(renderer, SettingsBut[3], NULL, &BackButtonRect);
+					draw_text(renderer, PointsTexture, PointsRect);
 					SDL_RenderPresent(renderer);
 				}
 				while (Check_Window == 3)
@@ -705,6 +731,9 @@ int main(int argc, char* argv[])
 			for (int i = 0; i < 4; i++) SDL_DestroyTexture(SettingsBut[i]);
 			SDL_DestroyTexture(ResTexture);
 			SDL_DestroyTexture(TexturMenu);
+			SDL_DestroyTexture(TexturBackNumb);
+			SDL_DestroyTexture(TexturGrid);
+			SDL_DestroyTexture(PointsTexture);
 			TTF_CloseFont(my_font);
 			TTF_Quit();
 			Mix_FreeMusic(fonmusic);
