@@ -66,6 +66,11 @@ void wrongtapsound(Mix_Chunk* Sound)
 	Sound = Mix_LoadWAV("wrong.wav");
 	Mix_PlayChannel(-1, Sound, 0);
 }
+void losesound(Mix_Chunk* Sound)
+{
+	Sound = Mix_LoadWAV("LoseGame.wav");
+	Mix_PlayChannel(-1, Sound, 0);
+}
 
 bool CheckSecondTap(int i, int j, int i1, int j1)
 {
@@ -484,8 +489,8 @@ int main(int argc, char* argv[])
 			
 			int numberlevel = 0;
 			levels Lvl[5];
-			Lvl[0].PointsLevel = 300; Lvl[0].TimeLevel = 120; //3000
-			Lvl[1].PointsLevel = 400; Lvl[1].TimeLevel = 150; //4500
+			Lvl[0].PointsLevel = 300; Lvl[0].TimeLevel = 15; //3000
+			Lvl[1].PointsLevel = 400; Lvl[1].TimeLevel = 17; //4500
 			Lvl[2].PointsLevel = 600; Lvl[2].TimeLevel = 175; //6000
 			Lvl[3].PointsLevel = 800; Lvl[3].TimeLevel = 200; //8000
 			Lvl[4].PointsLevel = 1000; Lvl[4].TimeLevel = 250; //10000
@@ -497,11 +502,11 @@ int main(int argc, char* argv[])
 			SDL_Color PointsColor = { 49, 125, 37 };
 			SDL_Texture* PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
 
-			int level1time = 120;
+			int level1time = Lvl[0].TimeLevel;
 			char leveltime[10];
 			_itoa_s(level1time, leveltime, 10);
-			SDL_Rect TimerRect = { 250, 50, 150, 50 };
-			SDL_Color TimerColor = { 49, 125, 37 };
+			SDL_Rect TimerRect = { W/2-75, 50, 150, 50 };
+			SDL_Color TimerColor = { 252, 56, 56 };
 			SDL_Texture* TimerTexture = get_text_texture(renderer, leveltime, my_font, TimerColor);
 
 			int PointsForWin = Lvl[0].PointsLevel;
@@ -567,6 +572,7 @@ int main(int argc, char* argv[])
 									if (i == 0)
 									{
 										TimeStartGame = (SDL_GetTicks() / 1000);
+										level1time = Lvl[0].TimeLevel;
 										Check_Window = 1;
 										RandomLevelGen(level1);
 										CheckGeneration(level1);
@@ -590,8 +596,19 @@ int main(int argc, char* argv[])
 						SDL_DestroyTexture(TimerTexture);
 						TimerTexture = get_text_texture(renderer, leveltime, my_font, TimerColor);
 					}
+					if (level1time == 0)
+					{
+						losesound(Sound);
+						points = 0;
+						numberlevel = 0;
+						TimeStartProgram2 = 0;
+						SDL_DestroyTexture(PointsTexture);
+						SDL_DestroyTexture(TimerTexture);
+						Check_Window = 0;
+					}
 					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
 					SDL_RenderCopy(renderer, TexturBackNumb, NULL, &PointsRect);
+					SDL_RenderCopy(renderer, TexturBackNumb, NULL, &TimerRect);
 					SDL_RenderCopy(renderer, TexturGrid, NULL, &GridRect);
 					while (SDL_PollEvent(&event))
 					{
@@ -607,7 +624,9 @@ int main(int argc, char* argv[])
 									tapsound(Sound);
 									points = 0;
 									numberlevel = 0;
+									TimeStartProgram2 = 0;
 									SDL_DestroyTexture(PointsTexture);
+									SDL_DestroyTexture(TimerTexture);
 									Check_Window = 0;
 								}
 								for (int i = 0; i < 8; i++)
@@ -699,6 +718,7 @@ int main(int argc, char* argv[])
 					if (points >= Lvl[numberlevel].PointsLevel)
 					{
 						numberlevel++;
+						level1time = Lvl[numberlevel].TimeLevel;
 						points = 0;
 						_itoa_s(points, Points, 10);
 						SDL_DestroyTexture(PointsTexture);
@@ -819,6 +839,7 @@ int main(int argc, char* argv[])
 			SDL_DestroyTexture(TexturBackNumb);
 			SDL_DestroyTexture(TexturGrid);
 			SDL_DestroyTexture(PointsTexture);
+			SDL_DestroyTexture(TimerTexture);
 			TTF_CloseFont(my_font);
 			TTF_Quit();
 			Mix_FreeMusic(fonmusic);
