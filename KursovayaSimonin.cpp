@@ -395,6 +395,7 @@ int main(int argc, char* argv[])
 	Mix_Music* fonmusic = NULL;
 	SDL_Texture* TexturImage[6];
 	SDL_Texture* SettingsBut[4];
+	SDL_Texture* PauseBut[2];
 	SDL_Texture* textTexture = NULL;
 	TTF_Font* my_font = NULL;
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) printf("SDL не смог запуститься! SDL_Error: %s\n", SDL_GetError());
@@ -445,7 +446,7 @@ int main(int argc, char* argv[])
 			int TimeStartProgram2 = 0;
 			int TimeStartGame;
 
-			SDL_Surface* SettingsButtons[4];
+			SDL_Surface* SettingsButtons[6];
 			SettingsButtons[0] = IMG_Load("SoundButton.bmp");
 			SettingsButtons[1] = IMG_Load("MusicButton.bmp");
 			SettingsButtons[2] = IMG_Load("ScreenButton.bmp");
@@ -482,6 +483,21 @@ int main(int argc, char* argv[])
 			SDL_Texture* ResTexture = get_text_texture(renderer, BestTime, my_font, BestTimeColor);
 			SDL_Rect BackButtonRect = { W - SetButtons[3].w, H - SetButtons[3].h, 50, 50 };
 
+			SDL_Surface* PauseButtons[2];
+			SDL_Rect PauseButtonsRect[2];
+			PauseButtons[0] = IMG_Load("save.bmp");
+			PauseButtons[1] = IMG_Load("cont.bmp");
+			SDL_SetColorKey(PauseButtons[0], SDL_TRUE, SDL_MapRGB(PauseButtons[0]->format, 255, 255, 255));
+			SDL_SetColorKey(PauseButtons[1], SDL_TRUE, SDL_MapRGB(PauseButtons[1]->format, 255, 255, 255));
+			for (int i = 0; i < 2; i++)PauseBut[i] = SDL_CreateTextureFromSurface(renderer, PauseButtons[i]);
+			for (int i = 0; i < 2; i++)
+			{
+				SDL_FreeSurface(PauseButtons[i]);
+				PauseButtons[i] = nullptr;
+			}
+			PauseButtonsRect[0] = { BackButtonRect.x - BackButtonRect.w - 25, H - SetButtons[3].h, 50, 50};
+			PauseButtonsRect[1] = { PauseButtonsRect[0].x - PauseButtonsRect[0].w - 25, H - SetButtons[3].h, 50, 50};
+
 			char WinMessage[55] = "Graz!!! You Win! ";
 			SDL_Rect WinMessageRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
 			SDL_Color WinMessageColor = { 0, 0, 0};
@@ -489,8 +505,8 @@ int main(int argc, char* argv[])
 			
 			int numberlevel = 0;
 			levels Lvl[5];
-			Lvl[0].PointsLevel = 3000; Lvl[0].TimeLevel = 15; //3000
-			Lvl[1].PointsLevel = 400; Lvl[1].TimeLevel = 17; //4500
+			Lvl[0].PointsLevel = 3000; Lvl[0].TimeLevel = 50; //3000
+			Lvl[1].PointsLevel = 4000; Lvl[1].TimeLevel = 50; //4500
 			Lvl[2].PointsLevel = 600; Lvl[2].TimeLevel = 175; //6000
 			Lvl[3].PointsLevel = 800; Lvl[3].TimeLevel = 200; //8000
 			Lvl[4].PointsLevel = 1000; Lvl[4].TimeLevel = 250; //10000
@@ -574,6 +590,9 @@ int main(int argc, char* argv[])
 										TimeStartGame = (SDL_GetTicks() / 1000);
 										level1time = Lvl[0].TimeLevel;
 										Check_Window = 1;
+										points = 0;
+										_itoa_s(points, Points, 10);
+										PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
 										RandomLevelGen(level1);
 										CheckGeneration(level1);
 										CheckGeneration(level1);
@@ -606,6 +625,10 @@ int main(int argc, char* argv[])
 						{
 							Check_Window = -1;
 							quit = 1;
+						}
+						if ((event.type == SDL_KEYDOWN) && (event.key.keysym.sym == SDLK_ESCAPE))
+						{
+							Check_Window = 6;
 						}
 						if (event.type == SDL_MOUSEBUTTONDOWN && (event.button.button == SDL_BUTTON_LEFT))
 						{
@@ -797,7 +820,6 @@ int main(int argc, char* argv[])
 									}
 									if (i == 2)
 									{
-
 									}
 									if (i == 3)	Check_Window = 0;
 								}
@@ -830,6 +852,43 @@ int main(int argc, char* argv[])
 						}
 					}
 					draw_text(renderer, WinMessageTexture, WinMessageRect);
+					SDL_RenderCopy(renderer, SettingsBut[3], NULL, &BackButtonRect);
+					SDL_RenderPresent(renderer);
+				}
+				while (Check_Window == 6)
+				{
+					while (SDL_PollEvent(&event))
+					{
+
+						if (event.type == SDL_QUIT)
+						{
+							Check_Window = -1;
+							quit = 1;
+						}
+						if ((event.type == SDL_KEYDOWN) && (event.key.keysym.sym == SDLK_ESCAPE))
+						{
+							Check_Window = 1;
+						}
+						if (event.type == SDL_MOUSEBUTTONDOWN && (event.button.button == SDL_BUTTON_LEFT))
+						{
+							if (CheckMenuHit(BackButtonRect, event.button.x, event.button.y))
+							{
+								tapsound(Sound);
+								Check_Window = 0;
+							}
+							for (int i = 0; i < 2; i++)
+							{
+								if (CheckMenuHit(PauseButtonsRect[i], event.button.x, event.button.y))
+								{
+									if (i == 1) Check_Window = 1;
+								}
+							}
+						}
+					}
+					for (int i = 0; i < 2; i++)
+					{
+						SDL_RenderCopy(renderer, PauseBut[i], NULL, &PauseButtonsRect[i]);
+					}
 					SDL_RenderCopy(renderer, SettingsBut[3], NULL, &BackButtonRect);
 					SDL_RenderPresent(renderer);
 				}
