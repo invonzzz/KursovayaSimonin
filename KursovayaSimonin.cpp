@@ -14,17 +14,6 @@ const int H = 700;
 #define NumbPict 6
 #define Setka 8
 
-void RandomLevelGen(int level[][8])
-{
-	srand(time(NULL));
-	for (int i = 0; i < Setka; i++)
-	{
-		for (int j = 0; j < Setka; j++)
-		{
-			level[i][j] = rand() % 6;
-		}
-	}
-}
 struct levels
 {
 	int TimeLevel;
@@ -44,7 +33,6 @@ SDL_Texture* get_text_texture(SDL_Renderer*& renderer, char* text, TTF_Font* fon
 	SDL_FreeSurface(textSurface);
 	return texture;
 }
-
 void draw_text(SDL_Renderer*& renderer, SDL_Texture* texture, SDL_Rect rect)
 {
 	SDL_RenderCopy(renderer, texture, NULL, &rect);
@@ -55,7 +43,6 @@ void loadmusic(Mix_Music* fon)
 	fon = Mix_LoadMUS("fon_music.wav");
 	Mix_PlayMusic(fon, -1);
 }
-
 void tapsound(Mix_Chunk* Sound)
 {
 	Sound = Mix_LoadWAV("tap_sound.wav");
@@ -79,34 +66,6 @@ bool CheckSecondTap(int i, int j, int i1, int j1)
 	if (j == j1 + 1 && i == i1) return 1;
 	if (j == j1 - 1 && i == i1) return 1;
 	else return 0;
-}
-int CheckCombinationLeftRight(int level[][8], int j1, int i1)
-{
-	int countcombright = 0;
-	int countcombleft = 0;
-	for (int q = 1; q <= 7-j1; q++)
-	{
-		if ((level[j1 + q][i1] == level[j1][i1]) || (level[j1 + q][i1] == 0))
-		{
-			countcombright += 1;
-		}
-		if ((level[j1 + q][i1] != level[j1][i1]) && (level[j1 + q][i1] != 0))
-		{
-			break;
-		}
-	}
-	for (int q = 1; q <= j1; q++)
-	{
-		if ((level[j1 - q][i1] == level[j1][i1]) || (level[j1 - q][i1] == 0))
-		{
-			countcombleft += 1;
-		}
-		if ((level[j1 - q][i1] != level[j1][i1]) && (level[j1 - q][i1] != 0))
-		{
-			break;
-		}
-	}
-	return countcombleft + countcombright + 1;
 }
 int CheckCombinationLeft(int level[][8], int j1, int i1)
 {
@@ -172,34 +131,6 @@ int CheckCombinationUp(int level[][8], int j1, int i1)
 	}
 	return countcombdown;
 }
-int CheckCombinationUpDown(int level[][8], int j1, int i1)
-{
-	int countcombup = 0;
-	int countcombdown = 0;
-	for (int q = 1; q <= 7 - i1; q++)
-	{
-		if ((level[j1][i1+q] == level[j1][i1]) || (level[j1][i1 + q] == 0))
-		{
-			countcombup += 1;
-		}
-		if ((level[j1][i1+q] != level[j1][i1]) && (level[j1][i1 + q] != 0))
-		{
-			break;
-		}
-	}
-	for (int q = 1; q <= i1; q++)
-	{
-		if ((level[j1][i1-q] == level[j1][i1]) || (level[j1][i1 - q] == 0))
-		{
-			countcombdown += 1;
-		}
-		if ((level[j1][i1-q] != level[j1][i1]) && (level[j1][i1 - q] != 0))
-		{
-			break;
-		}
-	}
-	return countcombdown + countcombup + 1;
-}
 void BrokeLeftRight(int level[][8], int stolb, int begin, int end)
 {
 	int temp[8][8];
@@ -250,6 +181,34 @@ void BrokeUpDown(int level[][8], int stolb, int begin, int end)
 		for (int j = 0; j < 8; j++)
 		{
 			level[j][i] = temp[i][j];
+		}
+	}
+}
+
+void CheckCombAfterMovLR(int level[][8])
+{
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 6; j++)
+		{
+			if ((level[j][i] == level[j + 1][i]) && (level[j][i] == level[j + 2][i]))
+			{
+				BrokeLeftRight(level, j, j, j + 2);
+			}
+		}
+	}
+}
+void CheckCombAfterMovUD(int level[][8])
+{
+	int temp = 0;
+	for (int i = 0; i < 6; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			if ((level[j][i] == level[j][i+1]) && (level[j][i] == level[j][i+2]))
+			{
+				BrokeUpDown(level, i, i, i + 2);
+			}
 		}
 	}
 }
@@ -350,6 +309,19 @@ void CheckGeneration(int level[][8])
 		}
 	}
 }
+void RandomLevelGen(int level[][8])
+{
+	srand(time(NULL));
+	for (int i = 0; i < Setka; i++)
+	{
+		for (int j = 0; j < Setka; j++)
+		{
+			level[i][j] = rand() % 6;
+		}
+	}
+}
+
+
 void UploadPict(SDL_Renderer*& render, SDL_Surface* SurfImage[], int number, SDL_Texture* TexturImage[], Gems gems[])
 {
 	char numb[10];
@@ -359,7 +331,6 @@ void UploadPict(SDL_Renderer*& render, SDL_Surface* SurfImage[], int number, SDL
 	TexturImage[number] = SDL_CreateTextureFromSurface(render, SurfImage[number]);
 	gems[number].GemTexture = TexturImage[number];
 }
-
 void DrawCells(SDL_Renderer*& renderer, Gems gem[][8], Gems gems[], int level[][8])
 {
 	srand(time(NULL));
@@ -378,7 +349,6 @@ bool CheckMenuHit(SDL_Rect MenuButtons, int x, int y)
 	int CenterY = MenuButtons.y + (MenuButtons.h / 2);
 	return (CenterX + MenuButtons.w / 2 > x) && (CenterX - MenuButtons.w / 2 < x) && (CenterY + MenuButtons.h / 2 > y) && (CenterY - MenuButtons.h / 2 < y);
 }
-
 void SetBut(SDL_Renderer* render, SDL_Rect SettingsButtons[])
 {
 	for (int i = 0; i < 3; i++)
@@ -505,11 +475,11 @@ int main(int argc, char* argv[])
 			
 			int numberlevel = 0;
 			levels Lvl[5];
-			Lvl[0].PointsLevel = 3000; Lvl[0].TimeLevel = 50; //3000
-			Lvl[1].PointsLevel = 4000; Lvl[1].TimeLevel = 50; //4500
-			Lvl[2].PointsLevel = 600; Lvl[2].TimeLevel = 175; //6000
-			Lvl[3].PointsLevel = 800; Lvl[3].TimeLevel = 200; //8000
-			Lvl[4].PointsLevel = 1000; Lvl[4].TimeLevel = 250; //10000
+			Lvl[0].PointsLevel = 3000; Lvl[0].TimeLevel = 120; //3000
+			Lvl[1].PointsLevel = 4500; Lvl[1].TimeLevel = 150; //4500
+			Lvl[2].PointsLevel = 6000; Lvl[2].TimeLevel = 175; //6000
+			Lvl[3].PointsLevel = 8000; Lvl[3].TimeLevel = 200; //8000
+			Lvl[4].PointsLevel = 10000; Lvl[4].TimeLevel = 250; //10000
 
 			int points = 0;
 			char Points[10];
@@ -517,6 +487,13 @@ int main(int argc, char* argv[])
 			SDL_Rect PointsRect = { 50, 50, 150, 50 };
 			SDL_Color PointsColor = { 49, 125, 37 };
 			SDL_Texture* PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
+
+			int pointfn = Lvl[0].PointsLevel;
+			char PointsForNext[10];
+			_itoa_s(pointfn, PointsForNext, 10);
+			SDL_Rect PointsFNRect = { W-200, 50, 150, 50 };
+			SDL_Color PointsFNColor = { 49, 125, 37 };
+			SDL_Texture* PointsFNTexture = get_text_texture(renderer, PointsForNext, my_font, PointsFNColor);
 
 			int level1time = Lvl[0].TimeLevel;
 			char leveltime[10];
@@ -600,6 +577,9 @@ int main(int argc, char* argv[])
 										in >> numberlevel;
 										in >> level1time;
 										in.close();
+										pointfn = Lvl[numberlevel].PointsLevel;
+										_itoa_s(pointfn, PointsForNext, 10);
+										PointsFNTexture = get_text_texture(renderer, PointsForNext, my_font, PointsFNColor);
 										_itoa_s(points, Points, 10);
 										PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
 										Check_Window = 1;
@@ -612,6 +592,9 @@ int main(int argc, char* argv[])
 										points = 0;
 										_itoa_s(points, Points, 10);
 										PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
+										pointfn = Lvl[0].PointsLevel;
+										_itoa_s(pointfn, PointsForNext, 10);
+										PointsFNTexture = get_text_texture(renderer, PointsForNext, my_font, PointsFNColor);
 										RandomLevelGen(level1);
 										CheckGeneration(level1);
 										CheckGeneration(level1);
@@ -637,6 +620,7 @@ int main(int argc, char* argv[])
 					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
 					SDL_RenderCopy(renderer, TexturBackNumb, NULL, &PointsRect);
 					SDL_RenderCopy(renderer, TexturBackNumb, NULL, &TimerRect);
+					SDL_RenderCopy(renderer, TexturBackNumb, NULL, &PointsFNRect);
 					SDL_RenderCopy(renderer, TexturGrid, NULL, &GridRect);
 					while (SDL_PollEvent(&event))
 					{
@@ -702,7 +686,7 @@ int main(int argc, char* argv[])
 						if (CheckCombinationLeft(level1, CheckCardOpeni2, CheckCardOpenj2) + CheckCombinationRight(level1, CheckCardOpeni2, CheckCardOpenj2) < 2) checkcomb1 += 1;
 						else
 						{
-							points1 = CheckCombinationLeftRight(level1, CheckCardOpeni2, CheckCardOpenj2);
+							points1 = CheckCombinationLeft(level1, CheckCardOpeni2, CheckCardOpenj2) + CheckCombinationRight(level1, CheckCardOpeni2, CheckCardOpenj2) + 1;
 							int BrokenRyadBegin = CheckCardOpeni2 - CheckCombinationLeft(level1, CheckCardOpeni2, CheckCardOpenj2);
 							int BrokenRyadEnd = CheckCardOpeni2 + CheckCombinationRight(level1, CheckCardOpeni2, CheckCardOpenj2);
 							BrokeLeftRight(level1, CheckCardOpenj2, BrokenRyadBegin, BrokenRyadEnd);
@@ -710,7 +694,7 @@ int main(int argc, char* argv[])
 						if (CheckCombinationUp(level1, CheckCardOpeni2, CheckCardOpenj2) + CheckCombinationDown(level1, CheckCardOpeni2, CheckCardOpenj2) < 2) checkcomb1 += 1;
 						else
 						{
-							points2 = CheckCombinationUpDown(level1, CheckCardOpeni2, CheckCardOpenj2);
+							points2 = CheckCombinationUp(level1, CheckCardOpeni2, CheckCardOpenj2) + CheckCombinationDown(level1, CheckCardOpeni2, CheckCardOpenj2) + 1;
 							int BrokenStolbBegin = CheckCardOpenj2 - CheckCombinationUp(level1, CheckCardOpeni2, CheckCardOpenj2);
 							int BrokenStolbEnd = CheckCardOpenj2 + CheckCombinationDown(level1, CheckCardOpeni2, CheckCardOpenj2);
 							BrokeUpDown(level1, CheckCardOpeni2, BrokenStolbBegin, BrokenStolbEnd);
@@ -721,7 +705,7 @@ int main(int argc, char* argv[])
 						if (CheckCombinationLeft(level1, CheckCardOpeni, CheckCardOpenj) + CheckCombinationRight(level1, CheckCardOpeni, CheckCardOpenj) < 2)checkcomb2 += 1;
 						else
 						{
-							points3 = CheckCombinationLeftRight(level1, CheckCardOpeni, CheckCardOpenj);
+							points3 = CheckCombinationLeft(level1, CheckCardOpeni, CheckCardOpenj) + CheckCombinationRight(level1, CheckCardOpeni, CheckCardOpenj) + 1;
 							int BrokenRyadBegin = CheckCardOpeni - CheckCombinationLeft(level1, CheckCardOpeni, CheckCardOpenj);
 							int BrokenRyadEnd = CheckCardOpeni + CheckCombinationRight(level1, CheckCardOpeni, CheckCardOpenj);
 							BrokeLeftRight(level1, CheckCardOpenj, BrokenRyadBegin, BrokenRyadEnd);
@@ -729,12 +713,12 @@ int main(int argc, char* argv[])
 						if (CheckCombinationUp(level1, CheckCardOpeni, CheckCardOpenj) + CheckCombinationDown(level1, CheckCardOpeni, CheckCardOpenj) < 2) checkcomb2 += 1;
 						else
 						{
-							points4 = CheckCombinationUpDown(level1, CheckCardOpeni, CheckCardOpenj);
+							points4 = CheckCombinationUp(level1, CheckCardOpeni, CheckCardOpenj) + CheckCombinationDown(level1, CheckCardOpeni, CheckCardOpenj) + 1;
 							int BrokenStolbBegin = CheckCardOpenj - CheckCombinationUp(level1, CheckCardOpeni, CheckCardOpenj);
 							int BrokenStolbEnd = CheckCardOpenj + CheckCombinationDown(level1, CheckCardOpeni, CheckCardOpenj);
 							BrokeUpDown(level1, CheckCardOpeni, BrokenStolbBegin, BrokenStolbEnd);
 						}
-						points += 100* points1 + 100*points2 + 100*points3 + 100*points4;
+						points += 100 * points1 + 100 * points2 + 100 * points3 + 100 * points4;
 						if ((checkcomb1 > 1) && (checkcomb2 > 1))
 						{
 							wrongtapsound(Sound);
@@ -758,10 +742,16 @@ int main(int argc, char* argv[])
 						PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
 						RandomLevelGen(level1);
 						CheckGeneration(level1);
+						pointfn = Lvl[numberlevel].PointsLevel;
+						_itoa_s(pointfn, PointsForNext, 10);
+						SDL_DestroyTexture(PointsFNTexture);
+						PointsFNTexture = get_text_texture(renderer, PointsForNext, my_font, PointsFNColor);
+
 					}
 					if (level1time == 0)
 					{
 						losesound(Sound);
+						pointfn = Lvl[0].PointsLevel;
 						points = 0;
 						numberlevel = 0;
 						TimeStartProgram2 = 0;
@@ -771,14 +761,18 @@ int main(int argc, char* argv[])
 					}
 					if (numberlevel > 4)
 					{
+						pointfn = Lvl[0].PointsLevel;
 						numberlevel = 0;
 						points = 0;
 						SDL_DestroyTexture(PointsTexture);
 						Check_Window = 5;
 					}
+					/*CheckCombAfterMovLR(level1);
+					CheckCombAfterMovUD(level1);*/
 					DrawCells(renderer, gem, GemGame, level1);
 					SDL_RenderCopy(renderer, SettingsBut[3], NULL, &BackButtonRect);
 					draw_text(renderer, PointsTexture, PointsRect);
+					draw_text(renderer, PointsFNTexture, PointsFNRect);
 					draw_text(renderer, TimerTexture, TimerRect);
 					SDL_RenderPresent(renderer);
 				}
@@ -899,18 +893,10 @@ int main(int argc, char* argv[])
 							{
 								if (CheckMenuHit(PauseButtonsRect[i], event.button.x, event.button.y))
 								{
+									tapsound(Sound);
 									if (i == 1) Check_Window = 1;
 									if (i == 0)
 									{
-										for (int q = 0; q < 8; q++)
-										{
-											for (int j = 0; j < 8; j++)
-											{
-												std::cout << level1[j][q] << " ";
-											}
-											std::cout << std::endl;
-										}
-										std::cout << std::endl;
 										std::ofstream out;
 										out.open("saves.txt");
 										for (int q = 0; q < 8; q++)
@@ -940,6 +926,7 @@ int main(int argc, char* argv[])
 			}
 			for (int i = 0; i < 4; i++) SDL_DestroyTexture(SettingsBut[i]);
 			for (int i = 0; i < 6; i++) SDL_DestroyTexture(TexturImage[i]);
+			for (int i = 0; i < 2; i++) SDL_DestroyTexture(PauseBut[i]);
 			SDL_DestroyTexture(ResTexture);
 			SDL_DestroyTexture(TexturMenu);
 			SDL_DestroyTexture(TexturBackNumb);
