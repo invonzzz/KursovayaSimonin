@@ -589,6 +589,7 @@ int main(int argc, char* argv[])
 									}
 									if (i == 0)
 									{
+										numberlevel = 0;
 										TimeStartGame = (SDL_GetTicks() / 1000);
 										level1time = Lvl[0].TimeLevel;
 										RecordVisionTime = 0;
