@@ -584,7 +584,26 @@ int main(int argc, char* argv[])
 									}
 									if (i == 3) Check_Window = 4;
 									if (i == 2) Check_Window = 3;
-									//if (i == 1) Check_Window = 2;
+									if (i == 1)
+									{
+										TimeStartGame = (SDL_GetTicks() / 1000);
+										std::ifstream in;
+										in.open("saves.txt");
+										for (int q = 0; q < 8; q++)
+										{
+											for (int j = 0; j < 8; j++)
+											{
+												in >> level1[j][q];
+											}
+										}
+										in >> points;
+										in >> numberlevel;
+										in >> level1time;
+										in.close();
+										_itoa_s(points, Points, 10);
+										PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
+										Check_Window = 1;
+									}
 									if (i == 0)
 									{
 										TimeStartGame = (SDL_GetTicks() / 1000);
@@ -881,6 +900,32 @@ int main(int argc, char* argv[])
 								if (CheckMenuHit(PauseButtonsRect[i], event.button.x, event.button.y))
 								{
 									if (i == 1) Check_Window = 1;
+									if (i == 0)
+									{
+										for (int q = 0; q < 8; q++)
+										{
+											for (int j = 0; j < 8; j++)
+											{
+												std::cout << level1[j][q] << " ";
+											}
+											std::cout << std::endl;
+										}
+										std::cout << std::endl;
+										std::ofstream out;
+										out.open("saves.txt");
+										for (int q = 0; q < 8; q++)
+										{
+											for (int j = 0; j < 8; j++)
+											{
+												out << level1[j][q];
+												out << " ";
+											}
+										}
+										out << points; out << " ";
+										out << numberlevel; out << " ";
+										out << level1time; out << " ";
+										out.close();
+									}
 								}
 							}
 						}
