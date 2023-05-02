@@ -440,6 +440,7 @@ int main(int argc, char* argv[])
 				file >> time1 >> time2 >> time3;
 			}
 			file.close();
+			int RecordTime, RecordTime2 = 0, RecordVisionTime = 0;
 			char time1txt[10], time2txt[10], time3txt[10];
 			char BestTime[55] = "Your best times: ";
 			_itoa_s(time1, time1txt, 10);
@@ -475,11 +476,11 @@ int main(int argc, char* argv[])
 			
 			int numberlevel = 0;
 			levels Lvl[5];
-			Lvl[0].PointsLevel = 3000; Lvl[0].TimeLevel = 120; //3000
-			Lvl[1].PointsLevel = 4500; Lvl[1].TimeLevel = 150; //4500
-			Lvl[2].PointsLevel = 6000; Lvl[2].TimeLevel = 175; //6000
-			Lvl[3].PointsLevel = 8000; Lvl[3].TimeLevel = 200; //8000
-			Lvl[4].PointsLevel = 10000; Lvl[4].TimeLevel = 250; //10000
+			Lvl[0].PointsLevel = 300; Lvl[0].TimeLevel = 120; //3000
+			Lvl[1].PointsLevel = 450; Lvl[1].TimeLevel = 150; //4500
+			Lvl[2].PointsLevel = 600; Lvl[2].TimeLevel = 175; //6000
+			Lvl[3].PointsLevel = 800; Lvl[3].TimeLevel = 200; //8000
+			Lvl[4].PointsLevel = 1000; Lvl[4].TimeLevel = 250; //10000
 
 			int points = 0;
 			char Points[10];
@@ -576,6 +577,8 @@ int main(int argc, char* argv[])
 										in >> points;
 										in >> numberlevel;
 										in >> level1time;
+										in >> RecordTime2;
+										in >> RecordVisionTime;
 										in.close();
 										pointfn = Lvl[numberlevel].PointsLevel;
 										_itoa_s(pointfn, PointsForNext, 10);
@@ -588,6 +591,7 @@ int main(int argc, char* argv[])
 									{
 										TimeStartGame = (SDL_GetTicks() / 1000);
 										level1time = Lvl[0].TimeLevel;
+										RecordVisionTime = 0;
 										Check_Window = 1;
 										points = 0;
 										_itoa_s(points, Points, 10);
@@ -608,6 +612,14 @@ int main(int argc, char* argv[])
 				}
 				while (Check_Window == 1)
 				{
+					RecordTime = (SDL_GetTicks() / 1000) - TimeStartGame;
+					if (RecordTime2 != RecordTime)
+					{
+						RecordTime2 = RecordTime;
+						RecordVisionTime += 1;
+					}
+					std::cout << RecordVisionTime;
+					system("cls");
 					TimeStartProgram = (SDL_GetTicks() / 1000) - TimeStartGame;
 					if (TimeStartProgram2 != TimeStartProgram)
 					{
@@ -641,6 +653,8 @@ int main(int argc, char* argv[])
 									points = 0;
 									numberlevel = 0;
 									TimeStartProgram2 = 0;
+									RecordVisionTime = 0;
+									RecordTime2 = 0;
 									SDL_DestroyTexture(PointsTexture);
 									//SDL_DestroyTexture(TimerTexture);
 									Check_Window = 0;
@@ -731,7 +745,7 @@ int main(int argc, char* argv[])
 						PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
 						check2try = 0;
 					}
-					if (points >= Lvl[numberlevel].PointsLevel)
+					if ((points >= Lvl[numberlevel].PointsLevel))
 					{
 						numberlevel++;
 						level1time = Lvl[numberlevel].TimeLevel;
@@ -742,10 +756,13 @@ int main(int argc, char* argv[])
 						PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
 						RandomLevelGen(level1);
 						CheckGeneration(level1);
-						pointfn = Lvl[numberlevel].PointsLevel;
-						_itoa_s(pointfn, PointsForNext, 10);
-						SDL_DestroyTexture(PointsFNTexture);
-						PointsFNTexture = get_text_texture(renderer, PointsForNext, my_font, PointsFNColor);
+						if (numberlevel <= 4)
+						{
+							pointfn = Lvl[numberlevel].PointsLevel;
+							_itoa_s(pointfn, PointsForNext, 10);
+							SDL_DestroyTexture(PointsFNTexture);
+							PointsFNTexture = get_text_texture(renderer, PointsForNext, my_font, PointsFNColor);
+						}
 
 					}
 					if (level1time == 0)
@@ -755,6 +772,8 @@ int main(int argc, char* argv[])
 						points = 0;
 						numberlevel = 0;
 						TimeStartProgram2 = 0;
+						RecordVisionTime = 0;
+						RecordTime2 = 0;
 						SDL_DestroyTexture(PointsTexture);
 						//SDL_DestroyTexture(TimerTexture);
 						Check_Window = 0;
@@ -765,6 +784,11 @@ int main(int argc, char* argv[])
 						numberlevel = 0;
 						points = 0;
 						SDL_DestroyTexture(PointsTexture);
+						SDL_DestroyTexture(PointsFNTexture);
+						std::ofstream Record;
+						Record.open("Records.txt");
+						Record << RecordVisionTime;
+						Record.close();
 						Check_Window = 5;
 					}
 					/*CheckCombAfterMovLR(level1);
@@ -910,6 +934,8 @@ int main(int argc, char* argv[])
 										out << points; out << " ";
 										out << numberlevel; out << " ";
 										out << level1time; out << " ";
+										out << RecordTime2; out << " ";
+										out << RecordVisionTime; out << " ";
 										out.close();
 									}
 								}
