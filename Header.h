@@ -1,5 +1,5 @@
 #pragma once
-
+//------STRUCTURES-----------------------------------------
 struct levels
 {
 	int TimeLevel;
