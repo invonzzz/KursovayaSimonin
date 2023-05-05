@@ -357,6 +357,28 @@ void SetBut(SDL_Renderer* render, SDL_Rect SettingsButtons[])
 	}
 }
 
+void UpdateRec(int& time1, int& time2, int& time3, int& RecordVisionTime)
+{
+	bool CheckRecConf = 0;
+	if (((RecordVisionTime < time1) || (time1 == 0)) && (CheckRecConf == 0))
+	{
+		time3 = time2;
+		time2 = time1;
+		time1 = RecordVisionTime;
+		CheckRecConf = 1;
+	}
+	if (((RecordVisionTime < time2) || (time2 == 0)) && (CheckRecConf == 0))
+	{
+		time3 = time2;
+		time2 = RecordVisionTime;
+		CheckRecConf = 1;
+	}
+	if (((RecordVisionTime < time3) || (time3 == 0)) && (CheckRecConf == 0))
+	{
+		time3 = RecordVisionTime;
+		CheckRecConf = 1;
+	}
+}
 
 int main(int argc, char* argv[])
 {
@@ -367,6 +389,7 @@ int main(int argc, char* argv[])
 	SDL_Texture* SettingsBut[4];
 	SDL_Texture* PauseBut[2];
 	SDL_Texture* textTexture = NULL;
+	SDL_Texture* ShowTimeAftGame = NULL;
 	TTF_Font* my_font = NULL;
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) printf("SDL не смог запуститься! SDL_Error: %s\n", SDL_GetError());
 	else
@@ -435,9 +458,12 @@ int main(int argc, char* argv[])
 			int time1 = 0, time2 = 0, time3 = 0;
 			std::ifstream file;
 			file.open("Records.txt");
-			while (!file.eof()) 
+			if (file.is_open())
 			{
-				file >> time1 >> time2 >> time3;
+				while (!file.eof())
+				{
+					file >> time1 >> time2 >> time3;
+				}
 			}
 			file.close();
 			int RecordTime, RecordTime2 = 0, RecordVisionTime = 0;
@@ -454,6 +480,11 @@ int main(int argc, char* argv[])
 			SDL_Texture* ResTexture = get_text_texture(renderer, BestTime, my_font, BestTimeColor);
 			SDL_Rect BackButtonRect = { W - SetButtons[3].w, H - SetButtons[3].h, 50, 50 };
 
+			char FileError[55] = "File not found!";
+			SDL_Color FileErrorColor = { 0, 0, 0 };
+			SDL_Rect FileErrorRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
+			SDL_Texture* FileErrorTexture = get_text_texture(renderer, FileError, my_font, FileErrorColor);
+
 			SDL_Surface* PauseButtons[2];
 			SDL_Rect PauseButtonsRect[2];
 			PauseButtons[0] = IMG_Load("save.bmp");
@@ -469,7 +500,7 @@ int main(int argc, char* argv[])
 			PauseButtonsRect[0] = { BackButtonRect.x - BackButtonRect.w - 25, H - SetButtons[3].h, 50, 50};
 			PauseButtonsRect[1] = { PauseButtonsRect[0].x - PauseButtonsRect[0].w - 25, H - SetButtons[3].h, 50, 50};
 
-			char WinMessage[55] = "Graz!!! You Win! ";
+			char WinMessage[55] = "Graz! You Win! Your time:";
 			SDL_Rect WinMessageRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
 			SDL_Color WinMessageColor = { 0, 0, 0};
 			SDL_Texture* WinMessageTexture = get_text_texture(renderer, WinMessage, my_font, WinMessageColor);
@@ -481,6 +512,8 @@ int main(int argc, char* argv[])
 			Lvl[2].PointsLevel = 600; Lvl[2].TimeLevel = 175; //6000
 			Lvl[3].PointsLevel = 800; Lvl[3].TimeLevel = 200; //8000
 			Lvl[4].PointsLevel = 1000; Lvl[4].TimeLevel = 250; //10000
+
+			SDL_Rect ShowTimeAGRect = { WinMessageRect.x + WinMessageRect.w + 20, WinMessageRect.y, 50, 100 };
 
 			int points = 0;
 			char Points[10];
@@ -561,31 +594,49 @@ int main(int argc, char* argv[])
 										quit = 1;
 									}
 									if (i == 3) Check_Window = 4;
-									if (i == 2) Check_Window = 3;
+									if (i == 2)
+									{
+										std::ifstream Records;
+										Records.open("Records.txt");
+										if (Records.is_open()) Check_Window = 3;
+										else Check_Window = 7;
+										Records.close();
+									}
 									if (i == 1)
 									{
 										TimeStartGame = (SDL_GetTicks() / 1000);
 										std::ifstream in;
 										in.open("saves.txt");
-										for (int q = 0; q < 8; q++)
+										if (in.is_open())
 										{
-											for (int j = 0; j < 8; j++)
+											if (in.peek() == EOF) Check_Window = 7;
+											else
 											{
-												in >> level1[j][q];
+												for (int q = 0; q < 8; q++)
+												{
+													for (int j = 0; j < 8; j++)
+													{
+														in >> level1[j][q];
+													}
+												}
+												in >> points;
+												in >> numberlevel;
+												in >> level1time;
+												in >> RecordTime2;
+												in >> RecordVisionTime;
+												pointfn = Lvl[numberlevel].PointsLevel;
+												_itoa_s(pointfn, PointsForNext, 10);
+												PointsFNTexture = get_text_texture(renderer, PointsForNext, my_font, PointsFNColor);
+												_itoa_s(points, Points, 10);
+												PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
+												Check_Window = 1;
 											}
 										}
-										in >> points;
-										in >> numberlevel;
-										in >> level1time;
-										in >> RecordTime2;
-										in >> RecordVisionTime;
+										else
+										{
+											Check_Window = 7;
+										}
 										in.close();
-										pointfn = Lvl[numberlevel].PointsLevel;
-										_itoa_s(pointfn, PointsForNext, 10);
-										PointsFNTexture = get_text_texture(renderer, PointsForNext, my_font, PointsFNColor);
-										_itoa_s(points, Points, 10);
-										PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
-										Check_Window = 1;
 									}
 									if (i == 0)
 									{
@@ -613,14 +664,13 @@ int main(int argc, char* argv[])
 				}
 				while (Check_Window == 1)
 				{
+					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
 					RecordTime = (SDL_GetTicks() / 1000) - TimeStartGame;
 					if (RecordTime2 != RecordTime)
 					{
 						RecordTime2 = RecordTime;
 						RecordVisionTime += 1;
 					}
-					std::cout << RecordVisionTime;
-					system("cls");
 					TimeStartProgram = (SDL_GetTicks() / 1000) - TimeStartGame;
 					if (TimeStartProgram2 != TimeStartProgram)
 					{
@@ -630,11 +680,6 @@ int main(int argc, char* argv[])
 						SDL_DestroyTexture(TimerTexture);
 						TimerTexture = get_text_texture(renderer, leveltime, my_font, TimerColor);
 					}
-					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
-					SDL_RenderCopy(renderer, TexturBackNumb, NULL, &PointsRect);
-					SDL_RenderCopy(renderer, TexturBackNumb, NULL, &TimerRect);
-					SDL_RenderCopy(renderer, TexturBackNumb, NULL, &PointsFNRect);
-					SDL_RenderCopy(renderer, TexturGrid, NULL, &GridRect);
 					while (SDL_PollEvent(&event))
 					{
 						if (event.type == SDL_QUIT)
@@ -786,16 +831,32 @@ int main(int argc, char* argv[])
 						points = 0;
 						SDL_DestroyTexture(PointsTexture);
 						SDL_DestroyTexture(PointsFNTexture);
+						char temptimewin[10];
+						_itoa_s(RecordVisionTime, temptimewin, 10);
+						strcat_s(temptimewin, "s");
+						ShowTimeAftGame = get_text_texture(renderer, temptimewin, my_font, WinMessageColor);
+						UpdateRec(time1, time2, time3, RecordVisionTime);
 						std::ofstream Record;
 						Record.open("Records.txt");
-						Record << RecordVisionTime;
+						Record << time1 << " " << time2 << " " << time3;
 						Record.close();
+						char BestTime[55] = "Your best times: ";
+						_itoa_s(time1, time1txt, 10);
+						_itoa_s(time2, time2txt, 10);
+						_itoa_s(time3, time3txt, 10);
+						strcat_s(BestTime, time1txt); strcat_s(BestTime, "s"); strcat_s(BestTime, " ");
+						strcat_s(BestTime, time2txt); strcat_s(BestTime, "s"); strcat_s(BestTime, " ");
+						strcat_s(BestTime, time3txt); strcat_s(BestTime, "s");
+						ResTexture = get_text_texture(renderer, BestTime, my_font, BestTimeColor);
+
 						Check_Window = 5;
 					}
-					/*CheckCombAfterMovLR(level1);
-					CheckCombAfterMovUD(level1);*/
-					DrawCells(renderer, gem, GemGame, level1);
+					SDL_RenderCopy(renderer, TexturBackNumb, NULL, &PointsRect);
+					SDL_RenderCopy(renderer, TexturBackNumb, NULL, &TimerRect);
+					SDL_RenderCopy(renderer, TexturBackNumb, NULL, &PointsFNRect);
+					SDL_RenderCopy(renderer, TexturGrid, NULL, &GridRect);
 					SDL_RenderCopy(renderer, SettingsBut[3], NULL, &BackButtonRect);
+					DrawCells(renderer, gem, GemGame, level1);
 					draw_text(renderer, PointsTexture, PointsRect);
 					draw_text(renderer, PointsFNTexture, PointsFNRect);
 					draw_text(renderer, TimerTexture, TimerRect);
@@ -890,6 +951,7 @@ int main(int argc, char* argv[])
 						}
 					}
 					draw_text(renderer, WinMessageTexture, WinMessageRect);
+					draw_text(renderer, ShowTimeAftGame, ShowTimeAGRect);
 					SDL_RenderCopy(renderer, SettingsBut[3], NULL, &BackButtonRect);
 					SDL_RenderPresent(renderer);
 				}
@@ -950,10 +1012,36 @@ int main(int argc, char* argv[])
 					SDL_RenderCopy(renderer, SettingsBut[3], NULL, &BackButtonRect);
 					SDL_RenderPresent(renderer);
 				}
+				while (Check_Window == 7)
+				{
+					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
+					while (SDL_PollEvent(&event))
+					{
+
+						if (event.type == SDL_QUIT)
+						{
+							Check_Window = -1;
+							quit = 1;
+						}
+						if (event.type == SDL_MOUSEBUTTONDOWN && (event.button.button == SDL_BUTTON_LEFT))
+						{
+							if (CheckMenuHit(BackButtonRect, event.button.x, event.button.y))
+							{
+								tapsound(Sound);
+								Check_Window = 0;
+							}
+						}
+					}
+					draw_text(renderer, FileErrorTexture, BestTimeRect);
+					SDL_RenderCopy(renderer, SettingsBut[3], NULL, &BackButtonRect);
+					SDL_RenderPresent(renderer);
+				}
 			}
 			for (int i = 0; i < 4; i++) SDL_DestroyTexture(SettingsBut[i]);
 			for (int i = 0; i < 6; i++) SDL_DestroyTexture(TexturImage[i]);
 			for (int i = 0; i < 2; i++) SDL_DestroyTexture(PauseBut[i]);
+			SDL_DestroyTexture(FileErrorTexture);
+			SDL_DestroyTexture(ShowTimeAftGame);
 			SDL_DestroyTexture(ResTexture);
 			SDL_DestroyTexture(TexturMenu);
 			SDL_DestroyTexture(TexturBackNumb);
