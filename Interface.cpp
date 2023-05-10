@@ -78,3 +78,40 @@ void UpdateRec(int& time1, int& time2, int& time3, int& RecordVisionTime)
 		CheckRecConf = 1;
 	}
 }
+void UpdateRects(bool fc, int W, int H, SDL_Rect& FonRect, SDL_Rect& MenuRect, SDL_Rect MenuButtons[], SDL_Rect SetButtons[], SDL_Rect& BackButtonRect, SDL_Rect PauseButtonsRect[], SDL_Rect& GridRect, SDL_Rect& BestTimeRect, SDL_Rect& FileErrorRect, SDL_Rect& WinMessageRect, SDL_Rect& ShowTimeAGRect, SDL_Rect& PointsRect, SDL_Rect& PointsFNRect, SDL_Rect& TimerRect, Gems gem[][8])
+{
+	MenuRect = { W / 2 - 217, H / 2 - 152, 435, 374 };
+	for (int i = 0; i < 5; i++) MenuButtons[i] = { MenuRect.x + 6, MenuRect.y + 6 + 80 * i, MenuRect.w - 12, 50 };
+	SetButtons[0] = { W / 2 - 175, H / 2, 50, 50 };
+	SetButtons[1] = { W / 2 - 75, H / 2, 50, 50 };
+	SetButtons[2] = { W / 2 + 25, H / 2, 50, 50 };
+	SetButtons[3] = { W / 2 + 125, H / 2, 50, 50 };
+	BackButtonRect = { W - SetButtons[3].w, H - SetButtons[3].h, 50, 50 };
+	PauseButtonsRect[0] = { BackButtonRect.x - BackButtonRect.w - 25, H - SetButtons[3].h, 50, 50 };
+	PauseButtonsRect[1] = { PauseButtonsRect[0].x - PauseButtonsRect[0].w - 25, H - SetButtons[3].h, 50, 50 };
+	GridRect = { W / 2 - 240, H / 4 - 25, 480, 480 };
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			gem[i][j].CardRect = { W / 2 - 240 + 60 * i, H / 4 - 25 + 60 * j, 60, 60 };
+		}
+	}
+	if (fc == 0)
+	{
+		PointsRect = { W - 750, H - 750, 150, 50 };
+		PointsFNRect = { W - 200, H - 750, 150, 50 };
+		TimerRect = { W / 2 - 75, H - 750, 150, 50 };
+	}
+	else
+	{
+		PointsRect = { W / 2 - 500, H - 150, 150, 50 };
+		PointsFNRect = { W / 2 + 500, H - 150, 150, 50 };
+		TimerRect = { W / 2 - 75, H - 150, 150, 50 };
+
+	}
+	BestTimeRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
+	FileErrorRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
+	WinMessageRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
+	ShowTimeAGRect = { WinMessageRect.x + WinMessageRect.w + 20, WinMessageRect.y, 50, 100 };
+}

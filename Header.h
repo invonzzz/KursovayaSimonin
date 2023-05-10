@@ -37,3 +37,4 @@ void DrawCells(SDL_Renderer*& renderer, Gems gem[][8], Gems gems[], int level[][
 bool CheckMenuHit(SDL_Rect MenuButtons, int x, int y);
 void SetBut(SDL_Renderer* render, SDL_Rect SettingsButtons[]);
 void UpdateRec(int& time1, int& time2, int& time3, int& RecordVisionTime);
+void UpdateRects(bool fc, int W, int H, SDL_Rect& FonRect, SDL_Rect& MenuRect, SDL_Rect MenuButtons[], SDL_Rect SetButtons[], SDL_Rect& BackButtonRect, SDL_Rect PauseButtonsRect[], SDL_Rect& GridRect, SDL_Rect& BestTimeRect, SDL_Rect& FileErrorRect, SDL_Rect& WinMessageRect, SDL_Rect& ShowTimeAGRect, SDL_Rect& PointsRect, SDL_Rect& PointsFNRect, SDL_Rect& TimerRect, Gems gem[][8]);
