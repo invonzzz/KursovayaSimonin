@@ -14,8 +14,8 @@
 #define Setka 8
 int main(int argc, char* argv[])
 {
-	int W = 800;
-	int H = 800;
+	int W = 800; int fW = 1920;
+	int H = 800; int fH = 1080;
 	SDL_Renderer* renderer = NULL;
 	Mix_Chunk* Sound = NULL;
 	Mix_Music* fonmusic = NULL;
@@ -28,14 +28,16 @@ int main(int argc, char* argv[])
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) printf("SDL не смог запуститься! SDL_Error: %s\n", SDL_GetError());
 	else
 	{
-		SDL_Window* window = SDL_CreateWindow(u8"Курсовая Симонин С.А. 'Три в ряд'", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, W, H, SDL_WINDOW_SHOWN);
+		SDL_Window* window = SDL_CreateWindow(u8"Курсовая Симонин С.А. 'Три в ряд'", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, W, H, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 		if (window == NULL) printf("Окно не может быть создано! SDL_Error: %s\n", SDL_GetError());
 		else
 		{
+			SDL_SetWindowSize(window, W, H);
 			renderer = SDL_CreateRenderer(window, -1, 0);
 
 			SDL_Surface* Fon = IMG_Load("fon.bmp");
-			SDL_Rect FonRect = { 0, 0, 0 + W, 0 + H };
+			SDL_Rect FonRect = { 0, 0, W, H };
+			bool FullScreenChecker = 0;
 			SDL_Texture* TexturFon = SDL_CreateTextureFromSurface(renderer, Fon);
 			SDL_FreeSurface(Fon);
 			Fon = nullptr;
@@ -594,6 +596,21 @@ int main(int argc, char* argv[])
 									}
 									if (i == 2)
 									{
+										if (FullScreenChecker == 0)
+										{
+											SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+											FonRect = { 0, 0, fW, fH };
+											FullScreenChecker = true;
+											break;
+										}
+										if (FullScreenChecker == 1)
+										{
+											SDL_SetWindowFullscreen(window, 0);
+											SDL_SetWindowSize(window, W, H);
+											FonRect = { 0, 0, W, H };
+											FullScreenChecker = false;
+											break;
+										}
 									}
 									if (i == 3)	Check_Window = 0;
 								}
