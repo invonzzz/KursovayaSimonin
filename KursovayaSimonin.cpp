@@ -394,7 +394,7 @@ int main(int argc, char* argv[])
 											if (check2try == 0)
 											{
 												tapsound(Sound);
-												check2try += 1;
+												check2try += 1;;
 											}
 										}
 									}
