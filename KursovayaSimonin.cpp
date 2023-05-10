@@ -12,6 +12,45 @@
 #include "Header.h"
 #define NumbPict 6
 #define Setka 8
+void UpdateRects(bool fc, int W, int H, SDL_Rect& FonRect, SDL_Rect& MenuRect, SDL_Rect MenuButtons[], SDL_Rect SetButtons[], SDL_Rect& BackButtonRect, SDL_Rect PauseButtonsRect[], SDL_Rect& GridRect, SDL_Rect& BestTimeRect, SDL_Rect& FileErrorRect, SDL_Rect& WinMessageRect, SDL_Rect& ShowTimeAGRect, SDL_Rect& PointsRect, SDL_Rect& PointsFNRect, SDL_Rect& TimerRect, Gems gem[][8])
+{
+	MenuRect = { W / 2 - 217, H / 2 - 152, 435, 374 };
+	for (int i = 0; i < 5; i++) MenuButtons[i] = { MenuRect.x + 6, MenuRect.y + 6 + 80 * i, MenuRect.w - 12, 50 };
+	SetButtons[0] = { W / 2 - 175, H / 2, 50, 50 };
+	SetButtons[1] = { W / 2 - 75, H / 2, 50, 50 };
+	SetButtons[2] = { W / 2 + 25, H / 2, 50, 50 };
+	SetButtons[3] = { W / 2 + 125, H / 2, 50, 50 };
+	BackButtonRect = { W - SetButtons[3].w, H - SetButtons[3].h, 50, 50 };
+	PauseButtonsRect[0] = { BackButtonRect.x - BackButtonRect.w - 25, H - SetButtons[3].h, 50, 50 };
+	PauseButtonsRect[1] = { PauseButtonsRect[0].x - PauseButtonsRect[0].w - 25, H - SetButtons[3].h, 50, 50 };
+	GridRect = { W / 2 - 240, H / 4 - 25, 480, 480 };
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			gem[i][j].CardRect = { W / 2 - 240 + 60 * i, H / 4 - 25 + 60 * j, 60, 60 };
+		}
+	}
+	if (fc == 0)
+	{
+		PointsRect = { W - 750, H - 750, 150, 50 };
+		PointsFNRect = { W - 200, H - 750, 150, 50 };
+		TimerRect = { W / 2 - 75, H - 750, 150, 50 };
+	}
+	else
+	{
+		PointsRect = { W/2 - 500, H - 150, 150, 50 };
+		PointsFNRect = { W/2 + 500, H - 150, 150, 50 };
+		TimerRect = { W / 2 - 75, H - 150, 150, 50 };
+
+	}
+	BestTimeRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
+	FileErrorRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
+	WinMessageRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
+	ShowTimeAGRect = { WinMessageRect.x + WinMessageRect.w + 20, WinMessageRect.y, 50, 100 };
+
+
+}
 int main(int argc, char* argv[])
 {
 	int W = 800; int fW = 1920;
@@ -35,9 +74,32 @@ int main(int argc, char* argv[])
 			SDL_SetWindowSize(window, W, H);
 			renderer = SDL_CreateRenderer(window, -1, 0);
 
+			bool FullScreenChecker = 0;
+			int Music = 100, tempmusic;
+			int SoundTap = 50, tempsoundtap;
+			std::ifstream soundin;
+			soundin.open("settings.txt");
+			if (soundin.is_open())
+			{
+				if (soundin.peek() == EOF)
+				{
+					Music = 100; SoundTap = 50; FullScreenChecker = 0;
+				}
+				else
+				{
+					soundin >> SoundTap;
+					soundin >> Music;
+					soundin >> FullScreenChecker;
+				}
+			}
+			else
+			{
+				Music = 100; SoundTap = 50; FullScreenChecker = 0;
+			}
+			soundin.close();
+
 			SDL_Surface* Fon = IMG_Load("fon.bmp");
 			SDL_Rect FonRect = { 0, 0, W, H };
-			bool FullScreenChecker = 0;
 			SDL_Texture* TexturFon = SDL_CreateTextureFromSurface(renderer, Fon);
 			SDL_FreeSurface(Fon);
 			Fon = nullptr;
@@ -71,7 +133,10 @@ int main(int argc, char* argv[])
 				SettingsButtons[i] = nullptr;
 			}
 			SDL_Rect SetButtons[4];
-			for (int i = 0; i < 4; i++) SetButtons[i] = { W / 4 + 100 * i, H / 2, 50, 50 };
+			SetButtons[0] = {W/2 - 175, H/2, 50, 50};
+			SetButtons[1] = {W/2 - 75, H/2, 50, 50};
+			SetButtons[2] = {W/2 + 25, H/2, 50, 50};
+			SetButtons[3] = {W/2 + 125, H/2, 50, 50};
 			SDL_Rect BackButtonRect = { W - SetButtons[3].w, H - SetButtons[3].h, 50, 50 };
 			SDL_Surface* PauseButtons[2];
 			SDL_Rect PauseButtonsRect[2];
@@ -148,7 +213,7 @@ int main(int argc, char* argv[])
 			
 			int numberlevel = 0;
 			levels Lvl[5];
-			Lvl[0].PointsLevel = 300; Lvl[0].TimeLevel = 120; //3000
+			Lvl[0].PointsLevel = 3000; Lvl[0].TimeLevel = 120; //3000
 			Lvl[1].PointsLevel = 450; Lvl[1].TimeLevel = 150; //4500
 			Lvl[2].PointsLevel = 600; Lvl[2].TimeLevel = 175; //6000
 			Lvl[3].PointsLevel = 800; Lvl[3].TimeLevel = 200; //8000
@@ -159,21 +224,21 @@ int main(int argc, char* argv[])
 			int points = 0;
 			char Points[10];
 			_itoa_s(points, Points, 10);
-			SDL_Rect PointsRect = { 50, 50, 150, 50 };
+			SDL_Rect PointsRect = { W-750, W-750, 150, 50 };
 			SDL_Color PointsColor = { 49, 125, 37 };
 			SDL_Texture* PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
 
 			int pointfn = Lvl[0].PointsLevel;
 			char PointsForNext[10];
 			_itoa_s(pointfn, PointsForNext, 10);
-			SDL_Rect PointsFNRect = { W-200, 50, 150, 50 };
+			SDL_Rect PointsFNRect = { W-200, H-750, 150, 50 };
 			SDL_Color PointsFNColor = { 49, 125, 37 };
 			SDL_Texture* PointsFNTexture = get_text_texture(renderer, PointsForNext, my_font, PointsFNColor);
 
 			int level1time = Lvl[0].TimeLevel;
 			char leveltime[10];
 			_itoa_s(level1time, leveltime, 10);
-			SDL_Rect TimerRect = { W/2-75, 50, 150, 50 };
+			SDL_Rect TimerRect = { W/2-75, H-750, 150, 50 };
 			SDL_Color TimerColor = { 252, 56, 56 };
 			SDL_Texture* TimerTexture = get_text_texture(renderer, leveltime, my_font, TimerColor);
 
@@ -182,27 +247,7 @@ int main(int argc, char* argv[])
 			_itoa_s(PointsForWin, PointsToWin, 10);
 
 //--MUSIC-------------------------------------------------------
-			int Music = 100, tempmusic;
-			int SoundTap = 50, tempsoundtap;
-			std::ifstream soundin;
-			soundin.open("settings.txt");
-			if (soundin.is_open())
-			{
-				if (soundin.peek() == EOF)
-				{
-					Music = 100; SoundTap = 50;
-				}
-				else
-				{
-					soundin >> SoundTap;
-					soundin >> Music;
-				}
-			}
-			else
-			{
-				Music = 100; SoundTap = 50;
-			}
-			soundin.close();
+			
 			Mix_Init(0);
 			Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024);
 			Mix_VolumeMusic(Music);
@@ -600,7 +645,8 @@ int main(int argc, char* argv[])
 										{
 											SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 											FonRect = { 0, 0, fW, fH };
-											FullScreenChecker = true;
+											FullScreenChecker = 1;
+											UpdateRects(FullScreenChecker, fW, fH, FonRect, MenuRect, MenuButtons, SetButtons, BackButtonRect, PauseButtonsRect, GridRect, BestTimeRect, FileErrorRect, WinMessageRect, ShowTimeAGRect, PointsRect, PointsFNRect, TimerRect, gem);
 											break;
 										}
 										if (FullScreenChecker == 1)
@@ -608,7 +654,8 @@ int main(int argc, char* argv[])
 											SDL_SetWindowFullscreen(window, 0);
 											SDL_SetWindowSize(window, W, H);
 											FonRect = { 0, 0, W, H };
-											FullScreenChecker = false;
+											FullScreenChecker = 0;
+											UpdateRects(FullScreenChecker, W, H, FonRect, MenuRect, MenuButtons, SetButtons, BackButtonRect, PauseButtonsRect, GridRect, BestTimeRect, FileErrorRect, WinMessageRect, ShowTimeAGRect, PointsRect, PointsFNRect, TimerRect, gem);
 											break;
 										}
 									}
