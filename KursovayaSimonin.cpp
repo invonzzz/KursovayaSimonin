@@ -14,8 +14,8 @@
 #define Setka 8
 int main(int argc, char* argv[])
 {
-	int W = 700;
-	int H = 700;
+	int W = 800;
+	int H = 800;
 	SDL_Renderer* renderer = NULL;
 	Mix_Chunk* Sound = NULL;
 	Mix_Music* fonmusic = NULL;
@@ -41,6 +41,8 @@ int main(int argc, char* argv[])
 			Fon = nullptr;
 			SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
 
+//-----Buttons in Menu----------------------------------------------------------------------------
+
 			SDL_Surface* Menu_Button = IMG_Load("menu.bmp");
 			SDL_Rect MenuRect = { W / 2 - 217, H / 2 - 152, 435, 374 };
 			SDL_SetColorKey(Menu_Button, SDL_TRUE, SDL_MapRGB(Menu_Button->format, 255, 255, 255));
@@ -55,24 +57,6 @@ int main(int argc, char* argv[])
 			SDL_FreeSurface(BackNumb);
 			BackNumb = nullptr;
 
-			SDL_Surface* grid = IMG_Load("grid.bmp");
-			SDL_Texture* TexturGrid = SDL_CreateTextureFromSurface(renderer, grid);
-			SDL_FreeSurface(grid);
-			grid = nullptr;
-			SDL_Rect GridRect = { W / 4 - 25, H / 4 - 25, 400, 400 };
-
-			int level1[8][8];
-			RandomLevelGen(level1);
-			int CheckCardOpeni = 0;
-			int CheckCardOpenj = 0;
-			int CheckCardOpeni2 = 0;
-			int CheckCardOpenj2 = 0;
-			int check2try = 0;
-
-			int TimeStartProgram;
-			int TimeStartProgram2 = 0;
-			int TimeStartGame;
-
 			SDL_Surface* SettingsButtons[6];
 			SettingsButtons[0] = IMG_Load("SoundButton.bmp");
 			SettingsButtons[1] = IMG_Load("MusicButton.bmp");
@@ -85,8 +69,45 @@ int main(int argc, char* argv[])
 				SettingsButtons[i] = nullptr;
 			}
 			SDL_Rect SetButtons[4];
-			for (int i = 0; i < 4; i++) SetButtons[i] = { W/4 + 100*i, H / 2, 50, 50};
+			for (int i = 0; i < 4; i++) SetButtons[i] = { W / 4 + 100 * i, H / 2, 50, 50 };
+			SDL_Rect BackButtonRect = { W - SetButtons[3].w, H - SetButtons[3].h, 50, 50 };
+			SDL_Surface* PauseButtons[2];
+			SDL_Rect PauseButtonsRect[2];
+			PauseButtons[0] = IMG_Load("save.bmp");
+			PauseButtons[1] = IMG_Load("cont.bmp");
+			SDL_SetColorKey(PauseButtons[0], SDL_TRUE, SDL_MapRGB(PauseButtons[0]->format, 255, 255, 255));
+			SDL_SetColorKey(PauseButtons[1], SDL_TRUE, SDL_MapRGB(PauseButtons[1]->format, 255, 255, 255));
+			for (int i = 0; i < 2; i++)PauseBut[i] = SDL_CreateTextureFromSurface(renderer, PauseButtons[i]);
+			for (int i = 0; i < 2; i++)
+			{
+				SDL_FreeSurface(PauseButtons[i]);
+				PauseButtons[i] = nullptr;
+			}
+			PauseButtonsRect[0] = { BackButtonRect.x - BackButtonRect.w - 25, H - SetButtons[3].h, 50, 50 };
+			PauseButtonsRect[1] = { PauseButtonsRect[0].x - PauseButtonsRect[0].w - 25, H - SetButtons[3].h, 50, 50 };
+//------------------------------------------------------------------------------------------
 
+//-----------Grid and level-----------------------------------------------------------------
+			SDL_Surface* grid = IMG_Load("grid.bmp");
+			SDL_Texture* TexturGrid = SDL_CreateTextureFromSurface(renderer, grid);
+			SDL_FreeSurface(grid);
+			grid = nullptr;
+			SDL_Rect GridRect = { W / 4 - 25, H / 4 - 25, 480, 480 };
+
+			int level1[8][8];
+			RandomLevelGen(level1);
+			int CheckCardOpeni = 0;
+			int CheckCardOpenj = 0;
+			int CheckCardOpeni2 = 0;
+			int CheckCardOpenj2 = 0;
+			int check2try = 0;
+//-----------------------------------------------------------------------------------------
+			int TimeStartProgram;
+			int TimeStartProgram2 = 0;
+			int TimeStartGame;
+
+			
+//----------font and records menu----------------------------------------------------------
 			TTF_Init();
 			my_font = TTF_OpenFont("arial.ttf", 100);
 			int time1 = 0, time2 = 0, time3 = 0;
@@ -112,27 +133,11 @@ int main(int argc, char* argv[])
 			SDL_Color BestTimeColor = { 0, 0, 0};
 			SDL_Rect BestTimeRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
 			SDL_Texture* ResTexture = get_text_texture(renderer, BestTime, my_font, BestTimeColor);
-			SDL_Rect BackButtonRect = { W - SetButtons[3].w, H - SetButtons[3].h, 50, 50 };
-
+//-------------------------------------------------------------------------------------------------
 			char FileError[55] = "File not found!";
 			SDL_Color FileErrorColor = { 0, 0, 0 };
 			SDL_Rect FileErrorRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
 			SDL_Texture* FileErrorTexture = get_text_texture(renderer, FileError, my_font, FileErrorColor);
-
-			SDL_Surface* PauseButtons[2];
-			SDL_Rect PauseButtonsRect[2];
-			PauseButtons[0] = IMG_Load("save.bmp");
-			PauseButtons[1] = IMG_Load("cont.bmp");
-			SDL_SetColorKey(PauseButtons[0], SDL_TRUE, SDL_MapRGB(PauseButtons[0]->format, 255, 255, 255));
-			SDL_SetColorKey(PauseButtons[1], SDL_TRUE, SDL_MapRGB(PauseButtons[1]->format, 255, 255, 255));
-			for (int i = 0; i < 2; i++)PauseBut[i] = SDL_CreateTextureFromSurface(renderer, PauseButtons[i]);
-			for (int i = 0; i < 2; i++)
-			{
-				SDL_FreeSurface(PauseButtons[i]);
-				PauseButtons[i] = nullptr;
-			}
-			PauseButtonsRect[0] = { BackButtonRect.x - BackButtonRect.w - 25, H - SetButtons[3].h, 50, 50};
-			PauseButtonsRect[1] = { PauseButtonsRect[0].x - PauseButtonsRect[0].w - 25, H - SetButtons[3].h, 50, 50};
 
 			char WinMessage[55] = "Graz! You Win! Your time:";
 			SDL_Rect WinMessageRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
@@ -174,7 +179,7 @@ int main(int argc, char* argv[])
 			char PointsToWin[10];
 			_itoa_s(PointsForWin, PointsToWin, 10);
 
-			
+//--MUSIC-------------------------------------------------------
 			int Music = 100, tempmusic;
 			int SoundTap = 50, tempsoundtap;
 			std::ifstream soundin;
@@ -201,7 +206,9 @@ int main(int argc, char* argv[])
 			Mix_VolumeMusic(Music);
 			Mix_Volume(-1, SoundTap);
 			loadmusic(fonmusic);
+//-----------------------------------------------------------------
 
+//------Gem_Pos&Texture--------------------------------------------
 			SDL_Surface* SurfImage[6];
 			Gems GemGame[6];
 			for (int i = 0; i < 6; i++) UploadPict(renderer, SurfImage, i, TexturImage, GemGame);
@@ -218,10 +225,10 @@ int main(int argc, char* argv[])
 			{
 				for (int j = 0; j < 8; j++)
 				{
-					gem[i][j].CardRect = { W/4 - 25 + 50 * i, H/4 - 25 + 50 * j, 50, 50 };
+					gem[i][j].CardRect = { W/4 - 25 + 60 * i, H/4 - 25 + 60 * j, 60, 60 };
 				}
 			}
-			
+//------------------------------------------------------------------------
 			int Check_Window = 0;
 			SDL_Event event;
 			bool quit = 0;
