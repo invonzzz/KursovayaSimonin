@@ -113,7 +113,6 @@ int main(int argc, char* argv[])
 			SDL_Texture* TexturMenu = SDL_CreateTextureFromSurface(renderer, Menu_Button);
 			SDL_FreeSurface(Menu_Button);
 			SDL_Rect MenuButtons[5];
-			for (int i = 0; i < 5; i++) MenuButtons[i] = {MenuRect.x + 6, MenuRect.y + 6 + 80 * i, MenuRect.w - 12, 50};
 
 			SDL_Surface* BackNumb = IMG_Load("BackNumb.bmp");
 			SDL_SetColorKey(BackNumb, SDL_TRUE, SDL_MapRGB(BackNumb->format, 255, 255, 255));
@@ -133,11 +132,8 @@ int main(int argc, char* argv[])
 				SettingsButtons[i] = nullptr;
 			}
 			SDL_Rect SetButtons[4];
-			SetButtons[0] = {W/2 - 175, H/2, 50, 50};
-			SetButtons[1] = {W/2 - 75, H/2, 50, 50};
-			SetButtons[2] = {W/2 + 25, H/2, 50, 50};
-			SetButtons[3] = {W/2 + 125, H/2, 50, 50};
-			SDL_Rect BackButtonRect = { W - SetButtons[3].w, H - SetButtons[3].h, 50, 50 };
+			
+			SDL_Rect BackButtonRect;
 			SDL_Surface* PauseButtons[2];
 			SDL_Rect PauseButtonsRect[2];
 			PauseButtons[0] = IMG_Load("save.bmp");
@@ -150,8 +146,7 @@ int main(int argc, char* argv[])
 				SDL_FreeSurface(PauseButtons[i]);
 				PauseButtons[i] = nullptr;
 			}
-			PauseButtonsRect[0] = { BackButtonRect.x - BackButtonRect.w - 25, H - SetButtons[3].h, 50, 50 };
-			PauseButtonsRect[1] = { PauseButtonsRect[0].x - PauseButtonsRect[0].w - 25, H - SetButtons[3].h, 50, 50 };
+			
 //------------------------------------------------------------------------------------------
 
 //-----------Grid and level-----------------------------------------------------------------
@@ -159,7 +154,7 @@ int main(int argc, char* argv[])
 			SDL_Texture* TexturGrid = SDL_CreateTextureFromSurface(renderer, grid);
 			SDL_FreeSurface(grid);
 			grid = nullptr;
-			SDL_Rect GridRect = { W / 4 - 25, H / 4 - 25, 480, 480 };
+			SDL_Rect GridRect;
 
 			int level1[8][8];
 			RandomLevelGen(level1);
@@ -198,16 +193,16 @@ int main(int argc, char* argv[])
 			strcat_s(BestTime, time2txt); strcat_s(BestTime, "s"); strcat_s(BestTime, " ");
 			strcat_s(BestTime, time3txt); strcat_s(BestTime, "s");
 			SDL_Color BestTimeColor = { 0, 0, 0};
-			SDL_Rect BestTimeRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
+			SDL_Rect BestTimeRect;
 			SDL_Texture* ResTexture = get_text_texture(renderer, BestTime, my_font, BestTimeColor);
 //-------------------------------------------------------------------------------------------------
 			char FileError[55] = "File not found!";
 			SDL_Color FileErrorColor = { 0, 0, 0 };
-			SDL_Rect FileErrorRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
+			SDL_Rect FileErrorRect;
 			SDL_Texture* FileErrorTexture = get_text_texture(renderer, FileError, my_font, FileErrorColor);
 
 			char WinMessage[55] = "Graz! You Win! Your time:";
-			SDL_Rect WinMessageRect = { W / 2 - 250, H / 2 - 50, 500, 100 };
+			SDL_Rect WinMessageRect;
 			SDL_Color WinMessageColor = { 0, 0, 0};
 			SDL_Texture* WinMessageTexture = get_text_texture(renderer, WinMessage, my_font, WinMessageColor);
 			
@@ -219,26 +214,26 @@ int main(int argc, char* argv[])
 			Lvl[3].PointsLevel = 800; Lvl[3].TimeLevel = 200; //8000
 			Lvl[4].PointsLevel = 1000; Lvl[4].TimeLevel = 250; //10000
 
-			SDL_Rect ShowTimeAGRect = { WinMessageRect.x + WinMessageRect.w + 20, WinMessageRect.y, 50, 100 };
+			SDL_Rect ShowTimeAGRect;
 
 			int points = 0;
 			char Points[10];
 			_itoa_s(points, Points, 10);
-			SDL_Rect PointsRect = { W-750, W-750, 150, 50 };
+			SDL_Rect PointsRect;
 			SDL_Color PointsColor = { 49, 125, 37 };
 			SDL_Texture* PointsTexture = get_text_texture(renderer, Points, my_font, PointsColor);
 
 			int pointfn = Lvl[0].PointsLevel;
 			char PointsForNext[10];
 			_itoa_s(pointfn, PointsForNext, 10);
-			SDL_Rect PointsFNRect = { W-200, H-750, 150, 50 };
+			SDL_Rect PointsFNRect;
 			SDL_Color PointsFNColor = { 49, 125, 37 };
 			SDL_Texture* PointsFNTexture = get_text_texture(renderer, PointsForNext, my_font, PointsFNColor);
 
 			int level1time = Lvl[0].TimeLevel;
 			char leveltime[10];
 			_itoa_s(level1time, leveltime, 10);
-			SDL_Rect TimerRect = { W/2-75, H-750, 150, 50 };
+			SDL_Rect TimerRect;
 			SDL_Color TimerColor = { 252, 56, 56 };
 			SDL_Texture* TimerTexture = get_text_texture(renderer, leveltime, my_font, TimerColor);
 
@@ -268,14 +263,21 @@ int main(int argc, char* argv[])
 			}
 
 			Gems gem[8][8];
-			for (int i = 0; i < 8; i++)
-			{
-				for (int j = 0; j < 8; j++)
-				{
-					gem[i][j].CardRect = { W/4 - 25 + 60 * i, H/4 - 25 + 60 * j, 60, 60 };
-				}
-			}
+			
 //------------------------------------------------------------------------
+			if (FullScreenChecker)
+			{
+				UpdateRects(FullScreenChecker, fW, fH, FonRect, MenuRect, MenuButtons, SetButtons, BackButtonRect, PauseButtonsRect, GridRect, BestTimeRect, FileErrorRect, WinMessageRect, ShowTimeAGRect, PointsRect, PointsFNRect, TimerRect, gem);
+				SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+				FonRect = { 0, 0, fW, fH };
+			}
+			if (!FullScreenChecker)
+			{
+				UpdateRects(FullScreenChecker, W, H, FonRect, MenuRect, MenuButtons, SetButtons, BackButtonRect, PauseButtonsRect, GridRect, BestTimeRect, FileErrorRect, WinMessageRect, ShowTimeAGRect, PointsRect, PointsFNRect, TimerRect, gem);
+				SDL_SetWindowFullscreen(window, 0);
+				SDL_SetWindowSize(window, W, H);
+				FonRect = { 0, 0, W, H };
+			}
 			int Check_Window = 0;
 			SDL_Event event;
 			bool quit = 0;
@@ -624,7 +626,7 @@ int main(int argc, char* argv[])
 										SoundTap = tempsoundtap;
 										std::ofstream soundfile;
 										soundfile.open("settings.txt");
-										soundfile << SoundTap << " " << Music << " ";
+										soundfile << SoundTap << " " << Music << " " << FullScreenChecker;
 										soundfile.close();
 										Mix_Volume(-1, SoundTap);
 									}
@@ -635,7 +637,7 @@ int main(int argc, char* argv[])
 										Music = tempmusic;
 										std::ofstream soundfile;
 										soundfile.open("settings.txt");
-										soundfile << SoundTap << " " << Music << " ";
+										soundfile << SoundTap << " " << Music << " " << FullScreenChecker;
 										soundfile.close();
 										Mix_VolumeMusic(Music);
 									}
@@ -647,6 +649,10 @@ int main(int argc, char* argv[])
 											FonRect = { 0, 0, fW, fH };
 											FullScreenChecker = 1;
 											UpdateRects(FullScreenChecker, fW, fH, FonRect, MenuRect, MenuButtons, SetButtons, BackButtonRect, PauseButtonsRect, GridRect, BestTimeRect, FileErrorRect, WinMessageRect, ShowTimeAGRect, PointsRect, PointsFNRect, TimerRect, gem);
+											std::ofstream fsfile;
+											fsfile.open("settings.txt");
+											fsfile << SoundTap << " " << Music << " " << FullScreenChecker;
+											fsfile.close();
 											break;
 										}
 										if (FullScreenChecker == 1)
@@ -656,6 +662,10 @@ int main(int argc, char* argv[])
 											FonRect = { 0, 0, W, H };
 											FullScreenChecker = 0;
 											UpdateRects(FullScreenChecker, W, H, FonRect, MenuRect, MenuButtons, SetButtons, BackButtonRect, PauseButtonsRect, GridRect, BestTimeRect, FileErrorRect, WinMessageRect, ShowTimeAGRect, PointsRect, PointsFNRect, TimerRect, gem);
+											std::ofstream fsfile;
+											fsfile.open("settings.txt");
+											fsfile << SoundTap << " " << Music << " " << FullScreenChecker;
+											fsfile.close();
 											break;
 										}
 									}
