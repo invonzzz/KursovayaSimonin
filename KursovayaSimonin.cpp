@@ -10,12 +10,12 @@
 #include <fstream>
 #include <string>
 #include "Header.h"
-const int W = 700;
-const int H = 700;
 #define NumbPict 6
 #define Setka 8
 int main(int argc, char* argv[])
 {
+	int W = 700;
+	int H = 700;
 	SDL_Renderer* renderer = NULL;
 	Mix_Chunk* Sound = NULL;
 	Mix_Music* fonmusic = NULL;
@@ -173,11 +173,33 @@ int main(int argc, char* argv[])
 			int PointsForWin = Lvl[0].PointsLevel;
 			char PointsToWin[10];
 			_itoa_s(PointsForWin, PointsToWin, 10);
+
+			
 			int Music = 100, tempmusic;
 			int SoundTap = 50, tempsoundtap;
+			std::ifstream soundin;
+			soundin.open("settings.txt");
+			if (soundin.is_open())
+			{
+				if (soundin.peek() == EOF)
+				{
+					Music = 100; SoundTap = 50;
+				}
+				else
+				{
+					soundin >> SoundTap;
+					soundin >> Music;
+				}
+			}
+			else
+			{
+				Music = 100; SoundTap = 50;
+			}
+			soundin.close();
 			Mix_Init(0);
 			Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024);
 			Mix_VolumeMusic(Music);
+			Mix_Volume(-1, SoundTap);
 			loadmusic(fonmusic);
 
 			SDL_Surface* SurfImage[6];
@@ -204,7 +226,8 @@ int main(int argc, char* argv[])
 			SDL_Event event;
 			bool quit = 0;
 			while (!quit)
-			{			
+			{	
+				//Главное меню
 				while (Check_Window == 0)
 				{
 					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
@@ -296,6 +319,7 @@ int main(int argc, char* argv[])
 					SDL_RenderCopy(renderer, TexturMenu, NULL, &MenuRect);
 					SDL_RenderPresent(renderer);
 				}
+				//Игра
 				while (Check_Window == 1)
 				{
 					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
@@ -496,6 +520,7 @@ int main(int argc, char* argv[])
 					draw_text(renderer, TimerTexture, TimerRect);
 					SDL_RenderPresent(renderer);
 				}
+				//Рекорды
 				while (Check_Window == 3)
 				{
 					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
@@ -520,6 +545,7 @@ int main(int argc, char* argv[])
 					SDL_RenderCopy(renderer, SettingsBut[3], NULL, &BackButtonRect);
 					SDL_RenderPresent(renderer);
 				}
+				//Меню настроек
 				while (Check_Window == 4)
 				{
 					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
@@ -542,6 +568,10 @@ int main(int argc, char* argv[])
 										if (SoundTap == 50) tempsoundtap = 0;
 										if (SoundTap == 0) tempsoundtap = 50;
 										SoundTap = tempsoundtap;
+										std::ofstream soundfile;
+										soundfile.open("settings.txt");
+										soundfile << SoundTap << " " << Music << " ";
+										soundfile.close();
 										Mix_Volume(-1, SoundTap);
 									}
 									if (i == 1)
@@ -549,6 +579,10 @@ int main(int argc, char* argv[])
 										if (Music == 100) tempmusic = 0;
 										if (Music == 0) tempmusic = 100;
 										Music = tempmusic;
+										std::ofstream soundfile;
+										soundfile.open("settings.txt");
+										soundfile << SoundTap << " " << Music << " ";
+										soundfile.close();
 										Mix_VolumeMusic(Music);
 									}
 									if (i == 2)
@@ -565,6 +599,7 @@ int main(int argc, char* argv[])
 					}
 					SDL_RenderPresent(renderer);
 				}
+				//Сообщение о победе
 				while (Check_Window == 5)
 				{
 					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
@@ -589,6 +624,7 @@ int main(int argc, char* argv[])
 					SDL_RenderCopy(renderer, SettingsBut[3], NULL, &BackButtonRect);
 					SDL_RenderPresent(renderer);
 				}
+				//Меню паузы во время игры
 				while (Check_Window == 6)
 				{
 					while (SDL_PollEvent(&event))
@@ -646,6 +682,7 @@ int main(int argc, char* argv[])
 					SDL_RenderCopy(renderer, SettingsBut[3], NULL, &BackButtonRect);
 					SDL_RenderPresent(renderer);
 				}
+				//Меню отсутствия файла(-ов)
 				while (Check_Window == 7)
 				{
 					SDL_RenderCopy(renderer, TexturFon, NULL, &FonRect);
