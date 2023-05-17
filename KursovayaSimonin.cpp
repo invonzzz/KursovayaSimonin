@@ -18,6 +18,9 @@ int main(int argc, char* argv[])
 	int H = 800; int fH = 1080;
 	SDL_Renderer* renderer = NULL;
 	Mix_Chunk* Sound = NULL;
+	Mix_Chunk* SoundTapN = NULL;
+	Mix_Chunk* SoundTapW = NULL;
+	Mix_Chunk* SoundLose = NULL;
 	Mix_Music* fonmusic = NULL;
 	SDL_Texture* TexturImage[6];
 	SDL_Texture* SettingsBut[4];
@@ -209,6 +212,10 @@ int main(int argc, char* argv[])
 			Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024);
 			Mix_VolumeMusic(Music);
 			Mix_Volume(-1, SoundTap);
+			SoundTapN = Mix_LoadWAV("tap_sound.wav");
+			SoundTapW = Mix_LoadWAV("wrong.wav");
+			SoundLose = Mix_LoadWAV("LoseGame.wav");
+			fonmusic = Mix_LoadMUS("fon_music.wav");
 			loadmusic(fonmusic);
 //-----------------------------------------------------------------
 
@@ -262,7 +269,7 @@ int main(int argc, char* argv[])
 							{
 								if (CheckMenuHit(MenuButtons[i], event.button.x, event.button.y))
 								{
-									tapsound(Sound);
+									tapsound(SoundTapN);
 									if (i == 4)
 									{
 										Check_Window = -1;
@@ -375,7 +382,7 @@ int main(int argc, char* argv[])
 						{
 								if (CheckMenuHit(BackButtonRect, event.button.x, event.button.y))
 								{
-									tapsound(Sound);
+									tapsound(SoundTapN);
 									points = 0;
 									numberlevel = 0;
 									TimeStartProgram2 = 0;
@@ -408,7 +415,7 @@ int main(int argc, char* argv[])
 											}
 											if (check2try == 0)
 											{
-												tapsound(Sound);
+												tapsound(SoundTapN);
 												check2try += 1;;
 											}
 										}
@@ -461,10 +468,10 @@ int main(int argc, char* argv[])
 						points += 100 * points1 + 100 * points2 + 100 * points3 + 100 * points4;
 						if ((checkcomb1 > 1) && (checkcomb2 > 1))
 						{
-							wrongtapsound(Sound);
+							wrongtapsound(SoundTapW);
 							std::swap(level1[CheckCardOpeni][CheckCardOpenj], level1[CheckCardOpeni2][CheckCardOpenj2]);
 						}
-						else tapsound(Sound);
+						else tapsound(SoundTapN);
 
 						_itoa_s(points, Points, 10);
 						SDL_DestroyTexture(PointsTexture);
@@ -493,7 +500,7 @@ int main(int argc, char* argv[])
 					}
 					if (level1time == 0)
 					{
-						losesound(Sound);
+						losesound(SoundLose);
 						pointfn = Lvl[0].PointsLevel;
 						points = 0;
 						numberlevel = 0;
@@ -558,7 +565,7 @@ int main(int argc, char* argv[])
 						{
 							if (CheckMenuHit(BackButtonRect, event.button.x, event.button.y))
 							{
-								tapsound(Sound);
+								tapsound(SoundTapN);
 
 								Check_Window = 0;
 							}
@@ -585,7 +592,7 @@ int main(int argc, char* argv[])
 							{
 								if (CheckMenuHit(SetButtons[i], event.button.x, event.button.y))
 								{
-									tapsound(Sound);
+									tapsound(SoundTapN);
 									if (i == 0)
 									{
 										if (SoundTap == 50) tempsoundtap = 0;
@@ -662,7 +669,7 @@ int main(int argc, char* argv[])
 						{
 							if (CheckMenuHit(BackButtonRect, event.button.x, event.button.y))
 							{
-								tapsound(Sound);
+								tapsound(SoundTapN);
 								Check_Window = 0;
 							}
 						}
@@ -691,14 +698,14 @@ int main(int argc, char* argv[])
 						{
 							if (CheckMenuHit(BackButtonRect, event.button.x, event.button.y))
 							{
-								tapsound(Sound);
+								tapsound(SoundTapN);
 								Check_Window = 0;
 							}
 							for (int i = 0; i < 2; i++)
 							{
 								if (CheckMenuHit(PauseButtonsRect[i], event.button.x, event.button.y))
 								{
-									tapsound(Sound);
+									tapsound(SoundTapN);
 									if (i == 1) Check_Window = 1;
 									if (i == 0)
 									{
@@ -746,7 +753,7 @@ int main(int argc, char* argv[])
 						{
 							if (CheckMenuHit(BackButtonRect, event.button.x, event.button.y))
 							{
-								tapsound(Sound);
+								tapsound(SoundTapN);
 								Check_Window = 0;
 							}
 						}
