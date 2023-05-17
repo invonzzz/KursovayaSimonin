@@ -9,8 +9,7 @@
 #include <fstream>
 #include <string>
 #include "Header.h"
-#define NumbPict 6
-#define Setka 8
+
 SDL_Texture* get_text_texture(SDL_Renderer*& renderer, char* text, TTF_Font* font, SDL_Color fore_color)
 {
 	SDL_Surface* textSurface = NULL;

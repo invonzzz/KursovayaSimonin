@@ -273,7 +273,11 @@ int main(int argc, char* argv[])
 									{
 										std::ifstream Records;
 										Records.open("Records.txt");
-										if (Records.is_open()) Check_Window = 3;
+										if (Records.is_open())
+										{
+											if ((time1 == 0) && (time2 == 0) && (time3 == 0)) Check_Window = 7;
+											else Check_Window = 3;
+										}
 										else Check_Window = 7;
 										Records.close();
 									}
@@ -378,7 +382,7 @@ int main(int argc, char* argv[])
 									RecordVisionTime = 0;
 									RecordTime2 = 0;
 									SDL_DestroyTexture(PointsTexture);
-									//SDL_DestroyTexture(TimerTexture);
+									SDL_DestroyTexture(TimerTexture);
 									Check_Window = 0;
 								}
 								for (int i = 0; i < 8; i++)
@@ -555,6 +559,7 @@ int main(int argc, char* argv[])
 							if (CheckMenuHit(BackButtonRect, event.button.x, event.button.y))
 							{
 								tapsound(Sound);
+
 								Check_Window = 0;
 							}
 						}

@@ -9,8 +9,8 @@
 #include <fstream>
 #include <string>
 #include "Header.h"
-#define NumbPict 6
-#define Setka 8
+#define NumbP 6
+#define Set 8
 bool CheckSecondTap(int i, int j, int i1, int j1)
 {
 	if (i == i1 + 1 && j == j1) return 1;
@@ -86,9 +86,9 @@ int CheckCombinationUp(int level[][8], int j1, int i1)
 void BrokeLeftRight(int level[][8], int stolb, int begin, int end)
 {
 	int temp[8][8];
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < Set; i++)
 	{
-		for (int j = 0; j < 8; j++)
+		for (int j = 0; j < Set; j++)
 		{
 			temp[i][j] = level[j][i];
 		}
@@ -104,9 +104,9 @@ void BrokeLeftRight(int level[][8], int stolb, int begin, int end)
 	{
 		temp[0][i] = rand() % (5 - 1 + 1) + 1;
 	}
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < Set; i++)
 	{
-		for (int j = 0; j < 8; j++)
+		for (int j = 0; j < Set; j++)
 		{
 			level[j][i] = temp[i][j];
 		}
@@ -114,11 +114,11 @@ void BrokeLeftRight(int level[][8], int stolb, int begin, int end)
 }
 void BrokeUpDown(int level[][8], int stolb, int begin, int end)
 {
-	int temp[8][8];
+	int temp[Set][Set];
 	int freegems = begin;
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < Set; i++)
 	{
-		for (int j = 0; j < 8; j++)
+		for (int j = 0; j < Set; j++)
 		{
 			temp[i][j] = level[j][i];
 		}
@@ -128,9 +128,9 @@ void BrokeUpDown(int level[][8], int stolb, int begin, int end)
 		if (i < freegems) temp[end - i][stolb] = temp[begin - i - 1][stolb];
 		else temp[end - i][stolb] = rand() % (5 - 1 + 1) + 1;
 	}
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < Set; i++)
 	{
-		for (int j = 0; j < 8; j++)
+		for (int j = 0; j < Set; j++)
 		{
 			level[j][i] = temp[i][j];
 		}
@@ -235,9 +235,9 @@ void CheckGeneration(int level[][8])
 void RandomLevelGen(int level[][8])
 {
 	srand(time(NULL));
-	for (int i = 0; i < Setka; i++)
+	for (int i = 0; i < Set; i++)
 	{
-		for (int j = 0; j < Setka; j++)
+		for (int j = 0; j < Set; j++)
 		{
 			level[i][j] = rand() % 6;
 		}

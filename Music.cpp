@@ -9,8 +9,6 @@
 #include <fstream>
 #include <string>
 #include "Header.h"
-#define NumbPict 6
-#define Setka 8
 
 void loadmusic(Mix_Music* fon)
 {
