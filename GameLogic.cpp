@@ -235,7 +235,7 @@ void RandomLevelGen(int level[][8])
 void ZeroElementLogic(int level1[][8], int CheckCardOpeni2, int CheckCardOpenj2)
 {
 	bool flag = 0;
-	if (CheckCardOpeni2 + 2 <= 7)
+	if (CheckCardOpeni2 + 2 <= 7 && flag == 0)
 	{
 		if (level1[CheckCardOpeni2 + 1][CheckCardOpenj2] == level1[CheckCardOpeni2 + 2][CheckCardOpenj2])
 		{
