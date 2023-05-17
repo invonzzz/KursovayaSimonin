@@ -419,6 +419,10 @@ int main(int argc, char* argv[])
 						int checkcomb2 = 0;
 						std::swap(level1[CheckCardOpeni][CheckCardOpenj], level1[CheckCardOpeni2][CheckCardOpenj2]);
 						//Первая нажатая фигура
+						if (level1[CheckCardOpeni2][CheckCardOpenj2] == 0)
+						{
+							ZeroElementLogic(level1, CheckCardOpeni2, CheckCardOpenj2);
+						}
 						if (CheckCombinationLeft(level1, CheckCardOpeni2, CheckCardOpenj2) + CheckCombinationRight(level1, CheckCardOpeni2, CheckCardOpenj2) < 2) checkcomb1 += 1;
 						else
 						{
@@ -438,6 +442,10 @@ int main(int argc, char* argv[])
 
 
 						//Вторая нажатая фигура
+						if (level1[CheckCardOpeni][CheckCardOpenj] == 0)
+						{
+							ZeroElementLogic(level1, CheckCardOpeni, CheckCardOpenj);
+						}
 						if (CheckCombinationLeft(level1, CheckCardOpeni, CheckCardOpenj) + CheckCombinationRight(level1, CheckCardOpeni, CheckCardOpenj) < 2)checkcomb2 += 1;
 						else
 						{

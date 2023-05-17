@@ -34,7 +34,7 @@ void BrokeLeftRight(int level[][8], int stolb, int begin, int end);
 void BrokeUpDown(int level[][8], int stolb, int begin, int end);
 void CheckGeneration(int level[][8]);
 void RandomLevelGen(int level[][8]);
-
+void ZeroElementLogic(int level[][8], int CheckCardOpeni2, int CheckCardOpenj2);
 
 //------MUSIC------------------------------------------------
 void loadmusic(Mix_Music* fon);

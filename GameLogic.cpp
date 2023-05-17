@@ -232,3 +232,55 @@ void RandomLevelGen(int level[][8])
 		}
 	}
 }
+void ZeroElementLogic(int level1[][8], int CheckCardOpeni2, int CheckCardOpenj2)
+{
+	bool flag = 0;
+	if (CheckCardOpeni2 + 2 <= 7)
+	{
+		if (level1[CheckCardOpeni2 + 1][CheckCardOpenj2] == level1[CheckCardOpeni2 + 2][CheckCardOpenj2])
+		{
+			level1[CheckCardOpeni2][CheckCardOpenj2] = level1[CheckCardOpeni2 + 1][CheckCardOpenj2];
+			flag = 1;
+		}
+	}
+	if (CheckCardOpeni2 + 1 <= 7 && CheckCardOpeni2 - 1 >= 0 && flag == 0)
+	{
+		if (level1[CheckCardOpeni2 + 1][CheckCardOpenj2] == level1[CheckCardOpeni2 - 1][CheckCardOpenj2])
+		{
+			level1[CheckCardOpeni2][CheckCardOpenj2] = level1[CheckCardOpeni2 + 1][CheckCardOpenj2];
+			flag = 1;
+		}
+	}
+	if (CheckCardOpeni2 - 2 >= 0 && flag == 0)
+	{
+		if (level1[CheckCardOpeni2 - 1][CheckCardOpenj2] == level1[CheckCardOpeni2 - 2][CheckCardOpenj2])
+		{
+			level1[CheckCardOpeni2][CheckCardOpenj2] = level1[CheckCardOpeni2 - 1][CheckCardOpenj2];
+			flag = 1;
+		}
+	}
+	if (CheckCardOpenj2 + 2 <= 7 && flag == 0)
+	{
+		if (level1[CheckCardOpeni2][CheckCardOpenj2 + 1] == level1[CheckCardOpeni2][CheckCardOpenj2 + 2])
+		{
+			level1[CheckCardOpeni2][CheckCardOpenj2] = level1[CheckCardOpeni2][CheckCardOpenj2 + 1];
+			flag = 1;
+		}
+	}
+	if (CheckCardOpenj2 + 1 <= 7 && CheckCardOpenj2 - 1 >= 0 && flag == 0)
+	{
+		if (level1[CheckCardOpeni2][CheckCardOpenj2 - 1] == level1[CheckCardOpeni2][CheckCardOpenj2 + 1])
+		{
+			level1[CheckCardOpeni2][CheckCardOpenj2] = level1[CheckCardOpeni2][CheckCardOpenj2 + 1];
+			flag = 1;
+		}
+	}
+	if (CheckCardOpenj2 - 2 >= 0 && flag == 0)
+	{
+		if (level1[CheckCardOpeni2][CheckCardOpenj2 - 1] == level1[CheckCardOpeni2][CheckCardOpenj2 - 2])
+		{
+			level1[CheckCardOpeni2][CheckCardOpenj2] = level1[CheckCardOpeni2][CheckCardOpenj2 - 1];
+			flag = 1;
+		}
+	}
+}
