@@ -389,7 +389,7 @@ int main(int argc, char* argv[])
 									RecordVisionTime = 0;
 									RecordTime2 = 0;
 									SDL_DestroyTexture(PointsTexture);
-									SDL_DestroyTexture(TimerTexture);
+									//SDL_DestroyTexture(TimerTexture);
 									Check_Window = 0;
 								}
 								for (int i = 0; i < 8; i++)
