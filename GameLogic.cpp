@@ -1,16 +1,5 @@
-#include <stdio.h>
-#include <iostream>
-#include <SDL.h>
-#include <stdlib.h>
-#include "SDL_ttf.h"
-#include "SDL_mixer.h"
-#include "SDL_image.h"
-#include <ctime>
-#include <fstream>
-#include <string>
 #include "Header.h"
-#define NumbP 6
-#define Set 8
+
 bool CheckSecondTap(int i, int j, int i1, int j1)
 {
 	if (i == i1 + 1 && j == j1) return 1;
@@ -24,7 +13,7 @@ int CheckCombinationLeft(int level[][8], int j1, int i1)
 	int countcombleft = 0;
 	for (int q = 1; q <= j1; q++)
 	{
-		if ((level[j1 - q][i1] == level[j1][i1]) || (level[j1 - q][i1] == 0) || (level[j1][i1] == 0))
+		if ((level[j1 - q][i1] == level[j1][i1]) || (level[j1 - q][i1] == 0))
 		{
 			countcombleft += 1;
 		}
@@ -40,7 +29,7 @@ int CheckCombinationRight(int level[][8], int j1, int i1)
 	int countcombright = 0;
 	for (int q = 1; q <= 7 - j1; q++)
 	{
-		if ((level[j1 + q][i1] == level[j1][i1]) || (level[j1 + q][i1] == 0) || (level[j1][i1] == 0))
+		if ((level[j1 + q][i1] == level[j1][i1]) || (level[j1 + q][i1] == 0))
 		{
 			countcombright += 1;
 		}
@@ -56,7 +45,7 @@ int CheckCombinationDown(int level[][8], int j1, int i1)
 	int countcombup = 0;
 	for (int q = 1; q <= 7 - i1; q++)
 	{
-		if ((level[j1][i1 + q] == level[j1][i1]) || (level[j1][i1 + q] == 0) || (level[j1][i1] == 0))
+		if ((level[j1][i1 + q] == level[j1][i1]) || (level[j1][i1 + q] == 0))
 		{
 			countcombup += 1;
 		}
@@ -72,7 +61,7 @@ int CheckCombinationUp(int level[][8], int j1, int i1)
 	int countcombdown = 0;
 	for (int q = 1; q <= i1; q++)
 	{
-		if ((level[j1][i1 - q] == level[j1][i1]) || (level[j1][i1 - q] == 0) || (level[j1][i1] == 0))
+		if ((level[j1][i1 - q] == level[j1][i1]) || (level[j1][i1 - q] == 0))
 		{
 			countcombdown += 1;
 		}

@@ -1,17 +1,6 @@
 ﻿#pragma comment(lib, "SDL2_mixer.lib")
-#include <stdio.h>
-#include <iostream>
-#include <SDL.h>
-#include <stdlib.h>
-#include "SDL_ttf.h"
-#include "SDL_mixer.h"
-#include "SDL_image.h"
-#include <ctime>
-#include <fstream>
-#include <string>
 #include "Header.h"
-#define NumbPict 6
-#define Setka 8
+
 int main(int argc, char* argv[])
 {
 	int W = 800; int fW = 1920;

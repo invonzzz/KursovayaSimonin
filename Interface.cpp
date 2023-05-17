@@ -1,13 +1,4 @@
-#include <stdio.h>
-#include <iostream>
-#include <SDL.h>
-#include <stdlib.h>
-#include "SDL_ttf.h"
-#include "SDL_mixer.h"
-#include "SDL_image.h"
-#include <ctime>
-#include <fstream>
-#include <string>
+
 #include "Header.h"
 
 SDL_Texture* get_text_texture(SDL_Renderer*& renderer, char* text, TTF_Font* font, SDL_Color fore_color)

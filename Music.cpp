@@ -1,13 +1,6 @@
 #include <stdio.h>
 #include <iostream>
-#include <SDL.h>
-#include <stdlib.h>
-#include "SDL_ttf.h"
-#include "SDL_mixer.h"
-#include "SDL_image.h"
-#include <ctime>
-#include <fstream>
-#include <string>
+
 #include "Header.h"
 
 void loadmusic(Mix_Music* fon)
