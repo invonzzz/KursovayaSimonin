@@ -161,11 +161,11 @@ int main(int argc, char* argv[])
 //------------level_info and ingame interface-------------------------------------------------------
 			int numberlevel = 0;
 			levels Lvl[5];
-			Lvl[0].PointsLevel = 3000; Lvl[0].TimeLevel = 120; //3000
-			Lvl[1].PointsLevel = 4500; Lvl[1].TimeLevel = 150; //4500
-			Lvl[2].PointsLevel = 6000; Lvl[2].TimeLevel = 175; //6000
-			Lvl[3].PointsLevel = 8000; Lvl[3].TimeLevel = 200; //8000
-			Lvl[4].PointsLevel = 10000; Lvl[4].TimeLevel = 250; //10000
+			Lvl[0].PointsLevel = 300; Lvl[0].TimeLevel = 120; //3000
+			Lvl[1].PointsLevel = 450; Lvl[1].TimeLevel = 150; //4500
+			Lvl[2].PointsLevel = 60; Lvl[2].TimeLevel = 175; //6000
+			Lvl[3].PointsLevel = 80; Lvl[3].TimeLevel = 200; //8000
+			Lvl[4].PointsLevel = 100; Lvl[4].TimeLevel = 250; //10000
 
 			SDL_Rect ShowTimeAGRect;
 

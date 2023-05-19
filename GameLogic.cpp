@@ -74,7 +74,7 @@ int CheckCombinationUp(int level[][8], int j1, int i1)
 }
 void BrokeLeftRight(int level[][8], int stolb, int begin, int end)
 {
-	int temp[8][8];
+	int temp[Set][Set];
 	for (int i = 0; i < Set; i++)
 	{
 		for (int j = 0; j < Set; j++)
